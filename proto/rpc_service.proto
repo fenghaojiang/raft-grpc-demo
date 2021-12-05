@@ -1,9 +1,10 @@
 syntax = "proto3";
 
-package rpc_servicepb;
+package rpcservicepb;
 
 message GetReq {
   string key = 1;
+  string level = 2;
 }
 
 message GetRsp {

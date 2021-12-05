@@ -104,7 +104,7 @@ func (c *CenterForRegister) serviceRegister(w http.ResponseWriter, req *http.Req
 			return
 		} else {
 			c.services[addr] = 0
-			log.Printf("service join addr: %s", addr)
+			log.Printf("server join addr: %s", addr)
 			w.WriteHeader(http.StatusOK)
 			return
 		}
