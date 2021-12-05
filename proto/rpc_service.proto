@@ -27,9 +27,20 @@ message DeleteRsp {
 
 }
 
+message JoinReq {
+  string grpcAddr = 1;
+  string raftAddr = 2;
+  string nodeID = 3;
+}
+
+message JoinRsp {
+
+}
+
 
 service RpcService {
   rpc Get(GetReq) returns (GetRsp) {}
   rpc Set(SetReq) returns (SetRsp) {}
   rpc Delete(DeleteReq) returns (DeleteRsp) {}
+  rpc Join(JoinReq) returns (JoinRsp) {}
 }

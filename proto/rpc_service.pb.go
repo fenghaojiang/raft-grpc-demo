@@ -282,6 +282,102 @@ func (m *DeleteRsp) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_DeleteRsp proto.InternalMessageInfo
 
+type JoinReq struct {
+	GrpcAddr string `protobuf:"bytes,1,opt,name=grpcAddr,proto3" json:"grpcAddr,omitempty"`
+	RaftAddr string `protobuf:"bytes,2,opt,name=raftAddr,proto3" json:"raftAddr,omitempty"`
+	NodeID   string `protobuf:"bytes,3,opt,name=nodeID,proto3" json:"nodeID,omitempty"`
+}
+
+func (m *JoinReq) Reset()         { *m = JoinReq{} }
+func (m *JoinReq) String() string { return proto.CompactTextString(m) }
+func (*JoinReq) ProtoMessage()    {}
+func (*JoinReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_eb646182a01d8986, []int{6}
+}
+func (m *JoinReq) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *JoinReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_JoinReq.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *JoinReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_JoinReq.Merge(m, src)
+}
+func (m *JoinReq) XXX_Size() int {
+	return m.Size()
+}
+func (m *JoinReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_JoinReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_JoinReq proto.InternalMessageInfo
+
+func (m *JoinReq) GetGrpcAddr() string {
+	if m != nil {
+		return m.GrpcAddr
+	}
+	return ""
+}
+
+func (m *JoinReq) GetRaftAddr() string {
+	if m != nil {
+		return m.RaftAddr
+	}
+	return ""
+}
+
+func (m *JoinReq) GetNodeID() string {
+	if m != nil {
+		return m.NodeID
+	}
+	return ""
+}
+
+type JoinRsp struct {
+}
+
+func (m *JoinRsp) Reset()         { *m = JoinRsp{} }
+func (m *JoinRsp) String() string { return proto.CompactTextString(m) }
+func (*JoinRsp) ProtoMessage()    {}
+func (*JoinRsp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_eb646182a01d8986, []int{7}
+}
+func (m *JoinRsp) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *JoinRsp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_JoinRsp.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *JoinRsp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_JoinRsp.Merge(m, src)
+}
+func (m *JoinRsp) XXX_Size() int {
+	return m.Size()
+}
+func (m *JoinRsp) XXX_DiscardUnknown() {
+	xxx_messageInfo_JoinRsp.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_JoinRsp proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterType((*GetReq)(nil), "rpc_servicepb.GetReq")
 	proto.RegisterType((*GetRsp)(nil), "rpc_servicepb.GetRsp")
@@ -289,26 +385,33 @@ func init() {
 	proto.RegisterType((*SetRsp)(nil), "rpc_servicepb.SetRsp")
 	proto.RegisterType((*DeleteReq)(nil), "rpc_servicepb.DeleteReq")
 	proto.RegisterType((*DeleteRsp)(nil), "rpc_servicepb.DeleteRsp")
+	proto.RegisterType((*JoinReq)(nil), "rpc_servicepb.JoinReq")
+	proto.RegisterType((*JoinRsp)(nil), "rpc_servicepb.JoinRsp")
 }
 
 func init() { proto.RegisterFile("rpc_service.proto", fileDescriptor_eb646182a01d8986) }
 
 var fileDescriptor_eb646182a01d8986 = []byte{
-	// 223 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x2c, 0x2a, 0x48, 0x8e,
-	0x2f, 0x4e, 0x2d, 0x2a, 0xcb, 0x4c, 0x4e, 0xd5, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0xe2, 0x45,
-	0x12, 0x2a, 0x48, 0x52, 0x92, 0xe2, 0x62, 0x73, 0x4f, 0x2d, 0x09, 0x4a, 0x2d, 0x14, 0x12, 0xe0,
-	0x62, 0xce, 0x4e, 0xad, 0x94, 0x60, 0x54, 0x60, 0xd4, 0xe0, 0x0c, 0x02, 0x31, 0x95, 0xe4, 0x20,
-	0x72, 0xc5, 0x05, 0x42, 0x22, 0x5c, 0xac, 0x65, 0x89, 0x39, 0xa5, 0xa9, 0x50, 0x59, 0x08, 0x47,
-	0xc9, 0x80, 0x8b, 0x2d, 0x18, 0x87, 0x5e, 0x84, 0x0e, 0x26, 0x64, 0x1d, 0x1c, 0x10, 0x1d, 0xc5,
-	0x05, 0x4a, 0xb2, 0x5c, 0x9c, 0x2e, 0xa9, 0x39, 0xa9, 0x25, 0xa9, 0xd8, 0xad, 0xe6, 0x86, 0x4b,
-	0x17, 0x17, 0x18, 0xed, 0x62, 0xe4, 0xe2, 0x0a, 0x2a, 0x48, 0x0e, 0x86, 0x38, 0x5a, 0xc8, 0x94,
-	0x8b, 0xd9, 0x3d, 0xb5, 0x44, 0x48, 0x54, 0x0f, 0xc5, 0x27, 0x7a, 0x10, 0x6f, 0x48, 0x61, 0x13,
-	0x2e, 0x2e, 0x50, 0x62, 0x00, 0x69, 0x0b, 0xc6, 0xa2, 0x2d, 0x18, 0xbb, 0xb6, 0x60, 0x98, 0x36,
-	0x3b, 0x2e, 0x36, 0x88, 0x4b, 0x84, 0x24, 0xd0, 0x94, 0xc0, 0xdd, 0x2f, 0x85, 0x43, 0x06, 0xa4,
-	0xdf, 0x49, 0xe2, 0xc4, 0x23, 0x39, 0xc6, 0x0b, 0x8f, 0xe4, 0x18, 0x1f, 0x3c, 0x92, 0x63, 0x9c,
-	0xf0, 0x58, 0x8e, 0xe1, 0xc2, 0x63, 0x39, 0x86, 0x1b, 0x8f, 0xe5, 0x18, 0x92, 0xd8, 0xc0, 0x11,
-	0x62, 0x0c, 0x08, 0x00, 0x00, 0xff, 0xff, 0x8c, 0xb9, 0x74, 0x1d, 0xa5, 0x01, 0x00, 0x00,
+	// 298 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x74, 0x92, 0xc1, 0x4a, 0xc3, 0x40,
+	0x10, 0x86, 0xb3, 0x46, 0x63, 0x33, 0x22, 0xe8, 0xa2, 0x25, 0x04, 0x5c, 0x64, 0x4f, 0x9e, 0x82,
+	0x28, 0x82, 0x27, 0x41, 0x29, 0x14, 0x3d, 0x26, 0x27, 0x4f, 0xd2, 0x26, 0xa3, 0x14, 0x4b, 0x33,
+	0xee, 0xc6, 0x82, 0x6f, 0xe1, 0x63, 0x79, 0xec, 0xd1, 0xa3, 0x24, 0xaf, 0xe0, 0x03, 0xc8, 0x66,
+	0x63, 0xac, 0x25, 0xbd, 0xe5, 0x9f, 0xff, 0xff, 0x32, 0xcc, 0xcf, 0xc2, 0xbe, 0xa2, 0xf4, 0x41,
+	0xa3, 0x9a, 0x4f, 0x52, 0x8c, 0x48, 0xe5, 0x45, 0xce, 0x77, 0x97, 0x46, 0x34, 0x96, 0x21, 0x78,
+	0x43, 0x2c, 0x62, 0x7c, 0xe1, 0x7b, 0xe0, 0x3e, 0xe3, 0x5b, 0xc0, 0x8e, 0xd9, 0x89, 0x1f, 0x9b,
+	0x4f, 0x29, 0xac, 0xa7, 0x89, 0x1f, 0xc0, 0xd6, 0x7c, 0x34, 0x7d, 0xc5, 0xc6, 0xb5, 0x42, 0x9e,
+	0x82, 0x97, 0xac, 0x61, 0xff, 0x88, 0x8d, 0x65, 0xa2, 0x67, 0x09, 0x4d, 0xf2, 0x08, 0xfc, 0x01,
+	0x4e, 0xb1, 0xc0, 0xee, 0xd5, 0x3b, 0xad, 0xad, 0x49, 0xde, 0xc3, 0xf6, 0x5d, 0x3e, 0x99, 0x99,
+	0x64, 0x08, 0xbd, 0x27, 0x45, 0xe9, 0x75, 0x96, 0xa9, 0x26, 0xde, 0x6a, 0xe3, 0xa9, 0xd1, 0x63,
+	0x51, 0x7b, 0x76, 0x6b, 0xab, 0x79, 0x1f, 0xbc, 0x59, 0x9e, 0xe1, 0xed, 0x20, 0x70, 0x6b, 0xa7,
+	0x51, 0xd2, 0x6f, 0x7e, 0xad, 0xe9, 0xec, 0x9b, 0x01, 0xc4, 0x94, 0x26, 0xb6, 0x1a, 0x7e, 0x01,
+	0xee, 0x10, 0x0b, 0x7e, 0x18, 0xfd, 0xeb, 0x2b, 0xb2, 0x65, 0x85, 0x5d, 0x63, 0x4d, 0xd2, 0x31,
+	0x58, 0xd2, 0x81, 0x25, 0xdd, 0x58, 0xf2, 0x8b, 0x5d, 0x81, 0x67, 0xef, 0xe5, 0xc1, 0x4a, 0xa4,
+	0x6d, 0x29, 0x5c, 0xe3, 0xd4, 0xfc, 0x25, 0x6c, 0x9a, 0x3b, 0x78, 0x7f, 0x25, 0xd3, 0xf4, 0x16,
+	0x76, 0xce, 0x0d, 0x79, 0x13, 0x7c, 0x94, 0x82, 0x2d, 0x4a, 0xc1, 0xbe, 0x4a, 0xc1, 0xde, 0x2b,
+	0xe1, 0x2c, 0x2a, 0xe1, 0x7c, 0x56, 0xc2, 0x19, 0x7b, 0xf5, 0x83, 0x39, 0xff, 0x09, 0x00, 0x00,
+	0xff, 0xff, 0x88, 0xff, 0xed, 0x91, 0x45, 0x02, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -326,6 +429,7 @@ type RpcServiceClient interface {
 	Get(ctx context.Context, in *GetReq, opts ...grpc.CallOption) (*GetRsp, error)
 	Set(ctx context.Context, in *SetReq, opts ...grpc.CallOption) (*SetRsp, error)
 	Delete(ctx context.Context, in *DeleteReq, opts ...grpc.CallOption) (*DeleteRsp, error)
+	Join(ctx context.Context, in *JoinReq, opts ...grpc.CallOption) (*JoinRsp, error)
 }
 
 type rpcServiceClient struct {
@@ -363,11 +467,21 @@ func (c *rpcServiceClient) Delete(ctx context.Context, in *DeleteReq, opts ...gr
 	return out, nil
 }
 
+func (c *rpcServiceClient) Join(ctx context.Context, in *JoinReq, opts ...grpc.CallOption) (*JoinRsp, error) {
+	out := new(JoinRsp)
+	err := c.cc.Invoke(ctx, "/rpc_servicepb.RpcService/Join", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // RpcServiceServer is the server API for RpcService service.
 type RpcServiceServer interface {
 	Get(context.Context, *GetReq) (*GetRsp, error)
 	Set(context.Context, *SetReq) (*SetRsp, error)
 	Delete(context.Context, *DeleteReq) (*DeleteRsp, error)
+	Join(context.Context, *JoinReq) (*JoinRsp, error)
 }
 
 // UnimplementedRpcServiceServer can be embedded to have forward compatible implementations.
@@ -382,6 +496,9 @@ func (*UnimplementedRpcServiceServer) Set(ctx context.Context, req *SetReq) (*Se
 }
 func (*UnimplementedRpcServiceServer) Delete(ctx context.Context, req *DeleteReq) (*DeleteRsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (*UnimplementedRpcServiceServer) Join(ctx context.Context, req *JoinReq) (*JoinRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Join not implemented")
 }
 
 func RegisterRpcServiceServer(s *grpc.Server, srv RpcServiceServer) {
@@ -442,6 +559,24 @@ func _RpcService_Delete_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RpcService_Join_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(JoinReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RpcServiceServer).Join(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/rpc_servicepb.RpcService/Join",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RpcServiceServer).Join(ctx, req.(*JoinReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _RpcService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "rpc_servicepb.RpcService",
 	HandlerType: (*RpcServiceServer)(nil),
@@ -457,6 +592,10 @@ var _RpcService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Delete",
 			Handler:    _RpcService_Delete_Handler,
+		},
+		{
+			MethodName: "Join",
+			Handler:    _RpcService_Join_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -636,6 +775,73 @@ func (m *DeleteRsp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *JoinReq) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *JoinReq) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *JoinReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.NodeID) > 0 {
+		i -= len(m.NodeID)
+		copy(dAtA[i:], m.NodeID)
+		i = encodeVarintRpcService(dAtA, i, uint64(len(m.NodeID)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.RaftAddr) > 0 {
+		i -= len(m.RaftAddr)
+		copy(dAtA[i:], m.RaftAddr)
+		i = encodeVarintRpcService(dAtA, i, uint64(len(m.RaftAddr)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.GrpcAddr) > 0 {
+		i -= len(m.GrpcAddr)
+		copy(dAtA[i:], m.GrpcAddr)
+		i = encodeVarintRpcService(dAtA, i, uint64(len(m.GrpcAddr)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *JoinRsp) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *JoinRsp) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *JoinRsp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintRpcService(dAtA []byte, offset int, v uint64) int {
 	offset -= sovRpcService(v)
 	base := offset
@@ -713,6 +919,36 @@ func (m *DeleteReq) Size() (n int) {
 }
 
 func (m *DeleteRsp) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *JoinReq) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.GrpcAddr)
+	if l > 0 {
+		n += 1 + l + sovRpcService(uint64(l))
+	}
+	l = len(m.RaftAddr)
+	if l > 0 {
+		n += 1 + l + sovRpcService(uint64(l))
+	}
+	l = len(m.NodeID)
+	if l > 0 {
+		n += 1 + l + sovRpcService(uint64(l))
+	}
+	return n
+}
+
+func (m *JoinRsp) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1164,6 +1400,202 @@ func (m *DeleteRsp) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: DeleteRsp: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipRpcService(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthRpcService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *JoinReq) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowRpcService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: JoinReq: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: JoinReq: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GrpcAddr", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRpcService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthRpcService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthRpcService
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.GrpcAddr = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RaftAddr", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRpcService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthRpcService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthRpcService
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RaftAddr = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NodeID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRpcService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthRpcService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthRpcService
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.NodeID = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipRpcService(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthRpcService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *JoinRsp) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowRpcService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: JoinRsp: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: JoinRsp: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
