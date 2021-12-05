@@ -1,12 +1,9 @@
 package service
 
 import (
-	"google.golang.org/grpc"
 	"log"
-	"net"
 	"os"
 	"raft-grpc-demo/core"
-	rpc_servicepb "raft-grpc-demo/proto"
 )
 
 type StoreApi interface {
@@ -22,35 +19,16 @@ type StoreApi interface {
 }
 
 type Service struct {
-	addr    string
-	store   StoreApi
-	grpcSrv *grpc.Server
+	addr  string
+	store StoreApi
 
 	logger *log.Logger
 }
 
-func New(store StoreApi, addr string) *Service {
-	grpcSrv := NewGrpcServer(addr)
+func NewService(store StoreApi, addr string) *Service {
 	return &Service{
-		addr:    addr,
-		store:   store,
-		grpcSrv: grpcSrv,
-		logger:  log.New(os.Stderr, "[grpc Service]", log.LstdFlags),
+		addr:   addr,
+		store:  store,
+		logger: log.New(os.Stderr, "[grpc Service]", log.LstdFlags),
 	}
-}
-
-func NewGrpcServer(addr string) *grpc.Server {
-	srv := grpc.NewServer()
-	rpc_servicepb.RegisterRpcServiceServer(srv, &Server{})
-	network := "tcp"
-	ln, err := net.Listen("tcp", addr)
-	if err != nil {
-		log.Panicf("listen to network %s, address %s failed", network, addr)
-	}
-	go func() {
-		if err := srv.Serve(ln); err != nil {
-			log.Panic("socket listener accept net conn failed", err.Error())
-		}
-	}()
-	return srv
 }

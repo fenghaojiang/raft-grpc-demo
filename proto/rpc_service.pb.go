@@ -27,6 +27,7 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type GetReq struct {
+	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 }
 
 func (m *GetReq) Reset()         { *m = GetReq{} }
@@ -62,7 +63,15 @@ func (m *GetReq) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_GetReq proto.InternalMessageInfo
 
+func (m *GetReq) GetKey() string {
+	if m != nil {
+		return m.Key
+	}
+	return ""
+}
+
 type GetRsp struct {
+	Value string `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
 }
 
 func (m *GetRsp) Reset()         { *m = GetRsp{} }
@@ -98,7 +107,16 @@ func (m *GetRsp) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_GetRsp proto.InternalMessageInfo
 
+func (m *GetRsp) GetValue() string {
+	if m != nil {
+		return m.Value
+	}
+	return ""
+}
+
 type SetReq struct {
+	Key   string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	Value string `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
 }
 
 func (m *SetReq) Reset()         { *m = SetReq{} }
@@ -133,6 +151,20 @@ func (m *SetReq) XXX_DiscardUnknown() {
 }
 
 var xxx_messageInfo_SetReq proto.InternalMessageInfo
+
+func (m *SetReq) GetKey() string {
+	if m != nil {
+		return m.Key
+	}
+	return ""
+}
+
+func (m *SetReq) GetValue() string {
+	if m != nil {
+		return m.Value
+	}
+	return ""
+}
 
 type SetRsp struct {
 }
@@ -171,6 +203,7 @@ func (m *SetRsp) XXX_DiscardUnknown() {
 var xxx_messageInfo_SetRsp proto.InternalMessageInfo
 
 type DeleteReq struct {
+	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 }
 
 func (m *DeleteReq) Reset()         { *m = DeleteReq{} }
@@ -205,6 +238,13 @@ func (m *DeleteReq) XXX_DiscardUnknown() {
 }
 
 var xxx_messageInfo_DeleteReq proto.InternalMessageInfo
+
+func (m *DeleteReq) GetKey() string {
+	if m != nil {
+		return m.Key
+	}
+	return ""
+}
 
 type DeleteRsp struct {
 }
@@ -254,19 +294,21 @@ func init() {
 func init() { proto.RegisterFile("rpc_service.proto", fileDescriptor_eb646182a01d8986) }
 
 var fileDescriptor_eb646182a01d8986 = []byte{
-	// 180 bytes of a gzipped FileDescriptorProto
+	// 223 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x2c, 0x2a, 0x48, 0x8e,
 	0x2f, 0x4e, 0x2d, 0x2a, 0xcb, 0x4c, 0x4e, 0xd5, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0xe2, 0x45,
-	0x12, 0x2a, 0x48, 0x52, 0xe2, 0xe0, 0x62, 0x73, 0x4f, 0x2d, 0x09, 0x4a, 0x2d, 0x84, 0xb1, 0x8a,
-	0x0b, 0x40, 0xac, 0x60, 0xb8, 0x58, 0x30, 0x44, 0x8c, 0x9b, 0x8b, 0xd3, 0x25, 0x35, 0x27, 0xb5,
-	0x24, 0x15, 0x24, 0x8c, 0xe0, 0x14, 0x17, 0x18, 0xed, 0x62, 0xe4, 0xe2, 0x0a, 0x2a, 0x48, 0x0e,
-	0x86, 0x18, 0x29, 0x64, 0xca, 0xc5, 0xec, 0x9e, 0x5a, 0x22, 0x24, 0xaa, 0x87, 0x62, 0x8f, 0x1e,
-	0xc4, 0x12, 0x29, 0x6c, 0xc2, 0xc5, 0x05, 0x4a, 0x0c, 0x20, 0x6d, 0xc1, 0x58, 0xb4, 0x05, 0x63,
-	0xd7, 0x16, 0x0c, 0xd3, 0x66, 0xc7, 0xc5, 0x06, 0x71, 0x89, 0x90, 0x04, 0x9a, 0x12, 0xb8, 0x6b,
-	0xa5, 0x70, 0xc8, 0x80, 0xf4, 0x3b, 0x49, 0x9c, 0x78, 0x24, 0xc7, 0x78, 0xe1, 0x91, 0x1c, 0xe3,
-	0x83, 0x47, 0x72, 0x8c, 0x13, 0x1e, 0xcb, 0x31, 0x5c, 0x78, 0x2c, 0xc7, 0x70, 0xe3, 0xb1, 0x1c,
-	0x43, 0x12, 0x1b, 0x38, 0xb8, 0x8c, 0x01, 0x01, 0x00, 0x00, 0xff, 0xff, 0xef, 0x9e, 0xaa, 0x4a,
-	0x43, 0x01, 0x00, 0x00,
+	0x12, 0x2a, 0x48, 0x52, 0x92, 0xe2, 0x62, 0x73, 0x4f, 0x2d, 0x09, 0x4a, 0x2d, 0x14, 0x12, 0xe0,
+	0x62, 0xce, 0x4e, 0xad, 0x94, 0x60, 0x54, 0x60, 0xd4, 0xe0, 0x0c, 0x02, 0x31, 0x95, 0xe4, 0x20,
+	0x72, 0xc5, 0x05, 0x42, 0x22, 0x5c, 0xac, 0x65, 0x89, 0x39, 0xa5, 0xa9, 0x50, 0x59, 0x08, 0x47,
+	0xc9, 0x80, 0x8b, 0x2d, 0x18, 0x87, 0x5e, 0x84, 0x0e, 0x26, 0x64, 0x1d, 0x1c, 0x10, 0x1d, 0xc5,
+	0x05, 0x4a, 0xb2, 0x5c, 0x9c, 0x2e, 0xa9, 0x39, 0xa9, 0x25, 0xa9, 0xd8, 0xad, 0xe6, 0x86, 0x4b,
+	0x17, 0x17, 0x18, 0xed, 0x62, 0xe4, 0xe2, 0x0a, 0x2a, 0x48, 0x0e, 0x86, 0x38, 0x5a, 0xc8, 0x94,
+	0x8b, 0xd9, 0x3d, 0xb5, 0x44, 0x48, 0x54, 0x0f, 0xc5, 0x27, 0x7a, 0x10, 0x6f, 0x48, 0x61, 0x13,
+	0x2e, 0x2e, 0x50, 0x62, 0x00, 0x69, 0x0b, 0xc6, 0xa2, 0x2d, 0x18, 0xbb, 0xb6, 0x60, 0x98, 0x36,
+	0x3b, 0x2e, 0x36, 0x88, 0x4b, 0x84, 0x24, 0xd0, 0x94, 0xc0, 0xdd, 0x2f, 0x85, 0x43, 0x06, 0xa4,
+	0xdf, 0x49, 0xe2, 0xc4, 0x23, 0x39, 0xc6, 0x0b, 0x8f, 0xe4, 0x18, 0x1f, 0x3c, 0x92, 0x63, 0x9c,
+	0xf0, 0x58, 0x8e, 0xe1, 0xc2, 0x63, 0x39, 0x86, 0x1b, 0x8f, 0xe5, 0x18, 0x92, 0xd8, 0xc0, 0x11,
+	0x62, 0x0c, 0x08, 0x00, 0x00, 0xff, 0xff, 0x8c, 0xb9, 0x74, 0x1d, 0xa5, 0x01, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -441,6 +483,13 @@ func (m *GetReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if len(m.Key) > 0 {
+		i -= len(m.Key)
+		copy(dAtA[i:], m.Key)
+		i = encodeVarintRpcService(dAtA, i, uint64(len(m.Key)))
+		i--
+		dAtA[i] = 0xa
+	}
 	return len(dAtA) - i, nil
 }
 
@@ -464,6 +513,13 @@ func (m *GetRsp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if len(m.Value) > 0 {
+		i -= len(m.Value)
+		copy(dAtA[i:], m.Value)
+		i = encodeVarintRpcService(dAtA, i, uint64(len(m.Value)))
+		i--
+		dAtA[i] = 0xa
+	}
 	return len(dAtA) - i, nil
 }
 
@@ -487,6 +543,20 @@ func (m *SetReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if len(m.Value) > 0 {
+		i -= len(m.Value)
+		copy(dAtA[i:], m.Value)
+		i = encodeVarintRpcService(dAtA, i, uint64(len(m.Value)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Key) > 0 {
+		i -= len(m.Key)
+		copy(dAtA[i:], m.Key)
+		i = encodeVarintRpcService(dAtA, i, uint64(len(m.Key)))
+		i--
+		dAtA[i] = 0xa
+	}
 	return len(dAtA) - i, nil
 }
 
@@ -533,6 +603,13 @@ func (m *DeleteReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if len(m.Key) > 0 {
+		i -= len(m.Key)
+		copy(dAtA[i:], m.Key)
+		i = encodeVarintRpcService(dAtA, i, uint64(len(m.Key)))
+		i--
+		dAtA[i] = 0xa
+	}
 	return len(dAtA) - i, nil
 }
 
@@ -576,6 +653,10 @@ func (m *GetReq) Size() (n int) {
 	}
 	var l int
 	_ = l
+	l = len(m.Key)
+	if l > 0 {
+		n += 1 + l + sovRpcService(uint64(l))
+	}
 	return n
 }
 
@@ -585,6 +666,10 @@ func (m *GetRsp) Size() (n int) {
 	}
 	var l int
 	_ = l
+	l = len(m.Value)
+	if l > 0 {
+		n += 1 + l + sovRpcService(uint64(l))
+	}
 	return n
 }
 
@@ -594,6 +679,14 @@ func (m *SetReq) Size() (n int) {
 	}
 	var l int
 	_ = l
+	l = len(m.Key)
+	if l > 0 {
+		n += 1 + l + sovRpcService(uint64(l))
+	}
+	l = len(m.Value)
+	if l > 0 {
+		n += 1 + l + sovRpcService(uint64(l))
+	}
 	return n
 }
 
@@ -612,6 +705,10 @@ func (m *DeleteReq) Size() (n int) {
 	}
 	var l int
 	_ = l
+	l = len(m.Key)
+	if l > 0 {
+		n += 1 + l + sovRpcService(uint64(l))
+	}
 	return n
 }
 
@@ -659,6 +756,38 @@ func (m *GetReq) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: GetReq: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRpcService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthRpcService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthRpcService
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Key = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipRpcService(dAtA[iNdEx:])
@@ -709,6 +838,38 @@ func (m *GetRsp) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: GetRsp: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Value", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRpcService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthRpcService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthRpcService
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Value = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipRpcService(dAtA[iNdEx:])
@@ -759,6 +920,70 @@ func (m *SetReq) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: SetReq: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRpcService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthRpcService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthRpcService
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Key = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Value", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRpcService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthRpcService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthRpcService
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Value = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipRpcService(dAtA[iNdEx:])
@@ -859,6 +1084,38 @@ func (m *DeleteReq) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: DeleteReq: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRpcService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthRpcService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthRpcService
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Key = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipRpcService(dAtA[iNdEx:])

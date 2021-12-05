@@ -3,15 +3,16 @@ syntax = "proto3";
 package rpc_servicepb;
 
 message GetReq {
-
+  string key = 1;
 }
 
 message GetRsp {
-
+  string value = 1;
 }
 
 message SetReq {
-
+  string key = 1;
+  string value = 2;
 }
 
 message SetRsp {
@@ -19,7 +20,7 @@ message SetRsp {
 }
 
 message DeleteReq {
-
+  string key = 1;
 }
 
 message DeleteRsp {
