@@ -2,6 +2,7 @@ package grpc_server
 
 import (
 	"context"
+	"fmt"
 	"google.golang.org/grpc"
 	"log"
 	"net"
@@ -85,6 +86,7 @@ func (s *Server) Get(ctx context.Context, req *rpcservicepb.GetReq) (*rpcservice
 			if leaderGrpcAddr == "" {
 				return nil, error_code.ServiceUnavailable
 			}
+			fmt.Println("header grpc addr:", leaderGrpcAddr, "server's leader connection: ", s.leaderConn.Target())
 			if leaderGrpcAddr == s.leaderConn.Target() {
 				//TODO
 			} else {
