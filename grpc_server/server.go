@@ -3,13 +3,14 @@ package grpc_server
 import (
 	"context"
 	"fmt"
-	"google.golang.org/grpc"
 	"log"
 	"net"
 	"os"
 	"raft-grpc-demo/core"
 	"raft-grpc-demo/error_code"
 	rpcservicepb "raft-grpc-demo/proto"
+
+	"google.golang.org/grpc"
 )
 
 type StoreApi interface {
@@ -42,6 +43,7 @@ type Server struct {
 }
 
 var _ rpcservicepb.RpcServiceServer = (*Server)(nil) // 检查是否实现所有方法
+var rpcserviceClient rpcservicepb.RpcServiceClient
 
 func NewGrpcServer(addr string, api StoreApi) *grpc.Server {
 	grpcSrv := grpc.NewServer()
@@ -80,17 +82,27 @@ func (s *Server) Get(ctx context.Context, req *rpcservicepb.GetReq) (*rpcservice
 		consLv = core.Default
 	}
 	value, err := s.store.Get(req.Key, consLv)
-	if err != nil {
+	if err != nil { //TODO modify for sub function
 		if err == core.ErrNotLeader {
 			leaderGrpcAddr := s.store.LeaderAPIAddr()
 			if leaderGrpcAddr == "" {
 				return nil, error_code.ServiceUnavailable
 			}
+			if s.leaderConn == nil {
+				s.leaderConn, err = grpc.Dial(leaderGrpcAddr)
+				if err != nil {
+					return nil, err
+				}
+			}
 			fmt.Println("header grpc addr:", leaderGrpcAddr, "server's leader connection: ", s.leaderConn.Target())
 			if leaderGrpcAddr == s.leaderConn.Target() {
-				//TODO
+
 			} else {
-				//TODO
+				s.leaderConn, err = grpc.Dial(leaderGrpcAddr)
+				if err != nil {
+					return nil, err
+				}
+
 			}
 
 		}
