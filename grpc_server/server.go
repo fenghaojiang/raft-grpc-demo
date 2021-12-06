@@ -2,7 +2,6 @@ package grpc_server
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net"
 	"os"
@@ -35,10 +34,11 @@ func NewServer(store StoreApi, addr string, ln net.Listener) *Server {
 }
 
 type Server struct {
-	addr       string
-	store      StoreApi
-	ln         net.Listener
-	logger     *log.Logger
+	addr   string
+	store  StoreApi
+	ln     net.Listener
+	logger *log.Logger
+	//leadClient rpcservicepb.RpcServiceClient
 	leaderConn *grpc.ClientConn
 }
 
@@ -82,32 +82,47 @@ func (s *Server) Get(ctx context.Context, req *rpcservicepb.GetReq) (*rpcservice
 		consLv = core.Default
 	}
 	value, err := s.store.Get(req.Key, consLv)
-	if err != nil { //TODO modify for sub function
+	if err != nil {
 		if err == core.ErrNotLeader {
 			leaderGrpcAddr := s.store.LeaderAPIAddr()
 			if leaderGrpcAddr == "" {
 				return nil, error_code.ServiceUnavailable
 			}
 			if s.leaderConn == nil {
-				s.leaderConn, err = grpc.Dial(leaderGrpcAddr)
+				rsp, err := s.get(ctx, leaderGrpcAddr, req.Key)
 				if err != nil {
 					return nil, err
 				}
-			}
-			fmt.Println("header grpc addr:", leaderGrpcAddr, "server's leader connection: ", s.leaderConn.Target())
-			if leaderGrpcAddr == s.leaderConn.Target() {
-
+				return rsp, nil
 			} else {
-				s.leaderConn, err = grpc.Dial(leaderGrpcAddr)
-				if err != nil {
-					return nil, err
+				if leaderGrpcAddr == s.leaderConn.Target() {
+					rpcserviceClient.Get(ctx, &rpcservicepb.GetReq{Key: req.Key})
+				} else {
+					rsp, err := s.get(ctx, leaderGrpcAddr, req.Key)
+					if err != nil {
+						return nil, err
+					}
+					return rsp, nil
 				}
-
 			}
-
 		}
+		return nil, error_code.InternalServerError
 	}
 	return &rpcservicepb.GetRsp{Value: value}, nil
+}
+
+func (s *Server) get(ctx context.Context, leaderGrpcAddr, key string) (*rpcservicepb.GetRsp, error) {
+	var err error
+	s.leaderConn, err = grpc.Dial(leaderGrpcAddr)
+	if err != nil {
+		return nil, err
+	}
+	rpcserviceClient = rpcservicepb.NewRpcServiceClient(s.leaderConn)
+	rsp, err := rpcserviceClient.Get(ctx, &rpcservicepb.GetReq{Key: key})
+	if err != nil {
+		return nil, err
+	}
+	return rsp, nil
 }
 
 func (s *Server) Set(ctx context.Context, req *rpcservicepb.SetReq) (*rpcservicepb.SetRsp, error) {
