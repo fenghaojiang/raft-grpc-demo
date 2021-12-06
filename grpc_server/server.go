@@ -84,27 +84,7 @@ func (s *Server) Get(ctx context.Context, req *rpcservicepb.GetReq) (*rpcservice
 	value, err := s.store.Get(req.Key, consLv)
 	if err != nil {
 		if err == core.ErrNotLeader {
-			leaderGrpcAddr := s.store.LeaderAPIAddr()
-			if leaderGrpcAddr == "" {
-				return nil, error_code.ServiceUnavailable
-			}
-			if s.leaderConn == nil {
-				rsp, err := s.get(ctx, leaderGrpcAddr, req.Key)
-				if err != nil {
-					return nil, err
-				}
-				return rsp, nil
-			} else {
-				if leaderGrpcAddr == s.leaderConn.Target() {
-					rpcserviceClient.Get(ctx, &rpcservicepb.GetReq{Key: req.Key})
-				} else {
-					rsp, err := s.get(ctx, leaderGrpcAddr, req.Key)
-					if err != nil {
-						return nil, err
-					}
-					return rsp, nil
-				}
-			}
+
 		}
 		return nil, error_code.InternalServerError
 	}
@@ -125,9 +105,39 @@ func (s *Server) get(ctx context.Context, leaderGrpcAddr, key string) (*rpcservi
 	return rsp, nil
 }
 
+//TODO
+// func (s *Server) verifyLeaderConnAndDosomething(ctx context.Context, req interface{}, f func(args ...string) interface{}, error) (interface{}, error) {
+// 	leaderGrpcAddr := s.store.LeaderAPIAddr()
+// 	if leaderGrpcAddr == "" {
+// 		return nil, error_code.ServiceUnavailable
+// 	}
+// 	if s.leaderConn == nil {
+// 		rsp, err := f
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 		return rsp, nil
+// 	} else {
+// 		if leaderGrpcAddr == s.leaderConn.Target() {
+// 			rpcserviceClient.Get(ctx, &rpcservicepb.GetReq{Key: req.Key})
+// 		} else {
+// 			rsp, err := s.get(ctx, leaderGrpcAddr, req.Key)
+// 			if err != nil {
+// 				return nil, err
+// 			}
+// 			return rsp, nil
+// 		}
+// 	}
+// }
+
 func (s *Server) Set(ctx context.Context, req *rpcservicepb.SetReq) (*rpcservicepb.SetRsp, error) {
-	//TODO
-	return nil, nil
+	if err := s.store.Set(req.Key, req.Value); err != nil {
+		if err == core.ErrNotLeader {
+
+		}
+		return nil, err
+	}
+	return &rpcservicepb.SetRsp{}, nil
 }
 
 func (s *Server) Delete(ctx context.Context, req *rpcservicepb.DeleteReq) (*rpcservicepb.DeleteRsp, error) {
