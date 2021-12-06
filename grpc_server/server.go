@@ -19,7 +19,7 @@ type StoreApi interface {
 
 	Delete(key string) error
 
-	Join(nodeID, httpAddr, raftAddr string) error
+	Join(nodeID, grpcAddr, raftAddr string) error
 
 	LeaderAPIAddr() string
 }
@@ -32,6 +32,13 @@ func NewServer(store StoreApi, addr string, ln net.Listener) *Server {
 		logger: log.New(os.Stderr, "[grpc Service]", log.LstdFlags),
 	}
 }
+
+const (
+	GetTypeID = int64(iota)
+	SetTypeID
+	JoinTypeID
+	DeleteTypeID
+)
 
 type Server struct {
 	addr   string
@@ -84,7 +91,11 @@ func (s *Server) Get(ctx context.Context, req *rpcservicepb.GetReq) (*rpcservice
 	value, err := s.store.Get(req.Key, consLv)
 	if err != nil {
 		if err == core.ErrNotLeader {
-
+			rsp, err := s.verifyLeaderConnReDial(ctx, req, GetTypeID)
+			if err != nil {
+				return nil, err
+			}
+			return rsp.(*rpcservicepb.GetRsp), nil
 		}
 		return nil, error_code.InternalServerError
 	}
@@ -105,47 +116,186 @@ func (s *Server) get(ctx context.Context, leaderGrpcAddr, key string) (*rpcservi
 	return rsp, nil
 }
 
-//TODO
-// func (s *Server) verifyLeaderConnAndDosomething(ctx context.Context, req interface{}, f func(args ...string) interface{}, error) (interface{}, error) {
-// 	leaderGrpcAddr := s.store.LeaderAPIAddr()
-// 	if leaderGrpcAddr == "" {
-// 		return nil, error_code.ServiceUnavailable
-// 	}
-// 	if s.leaderConn == nil {
-// 		rsp, err := f
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 		return rsp, nil
-// 	} else {
-// 		if leaderGrpcAddr == s.leaderConn.Target() {
-// 			rpcserviceClient.Get(ctx, &rpcservicepb.GetReq{Key: req.Key})
-// 		} else {
-// 			rsp, err := s.get(ctx, leaderGrpcAddr, req.Key)
-// 			if err != nil {
-// 				return nil, err
-// 			}
-// 			return rsp, nil
-// 		}
-// 	}
-// }
+func (s *Server) verifyLeaderConnReDial(ctx context.Context, req interface{}, typeID int64) (interface{}, error) {
+	leaderGrpcAddr := s.store.LeaderAPIAddr()
+	if leaderGrpcAddr == "" {
+		return nil, error_code.ServiceUnavailable
+	}
+	switch typeID {
+	case GetTypeID:
+		if s.leaderConn == nil {
+			rsp, err := s.get(ctx, leaderGrpcAddr, req.(*rpcservicepb.GetReq).Key)
+			if err != nil {
+				return nil, err
+			}
+			return rsp, err
+		} else {
+			if leaderGrpcAddr == s.leaderConn.Target() {
+				rsp, err := rpcserviceClient.Get(ctx, req.(*rpcservicepb.GetReq))
+				if err != nil {
+					return nil, err
+				}
+				return rsp, nil
+			} else {
+				rsp, err := s.get(ctx, leaderGrpcAddr, req.(*rpcservicepb.GetReq).Key)
+				if err != nil {
+					return nil, err
+				}
+				return rsp, nil
+			}
+		}
+	case SetTypeID:
+		if s.leaderConn == nil {
+			rsp, err := s.set(ctx, leaderGrpcAddr, req.(*rpcservicepb.SetReq).Key, req.(*rpcservicepb.SetReq).Value)
+			if err != nil {
+				return nil, err
+			}
+			return rsp, err
+		} else {
+			if leaderGrpcAddr == s.leaderConn.Target() {
+				rsp, err := rpcserviceClient.Set(ctx, req.(*rpcservicepb.SetReq))
+				if err != nil {
+					return nil, err
+				}
+				return rsp, nil
+			} else {
+				rsp, err := s.set(ctx, leaderGrpcAddr, req.(*rpcservicepb.SetReq).Key, req.(*rpcservicepb.SetReq).Value)
+				if err != nil {
+					return nil, err
+				}
+				return rsp, nil
+			}
+		}
+	case DeleteTypeID:
+		if s.leaderConn == nil {
+			rsp, err := s.delete(ctx, leaderGrpcAddr, req.(*rpcservicepb.DeleteReq).Key)
+			if err != nil {
+				return nil, err
+			}
+			return rsp, err
+		} else {
+			if leaderGrpcAddr == s.leaderConn.Target() {
+				rsp, err := rpcserviceClient.Delete(ctx, req.(*rpcservicepb.DeleteReq))
+				if err != nil {
+					return nil, err
+				}
+				return rsp, nil
+			} else {
+				rsp, err := s.delete(ctx, leaderGrpcAddr, req.(*rpcservicepb.DeleteReq).Key)
+				if err != nil {
+					return nil, err
+				}
+				return rsp, nil
+			}
+		}
+	case JoinTypeID:
+		if s.leaderConn == nil {
+			rsp, err := s.join(ctx, leaderGrpcAddr, req.(*rpcservicepb.JoinReq).GrpcAddr, req.(*rpcservicepb.JoinReq).RaftAddr, req.(*rpcservicepb.JoinReq).NodeID)
+			if err != nil {
+				return nil, err
+			}
+			return rsp, err
+		} else {
+			if leaderGrpcAddr == s.leaderConn.Target() {
+				rsp, err := rpcserviceClient.Join(ctx, req.(*rpcservicepb.JoinReq))
+				if err != nil {
+					return nil, err
+				}
+				return rsp, nil
+			} else {
+				rsp, err := s.join(ctx, leaderGrpcAddr, req.(*rpcservicepb.JoinReq).GrpcAddr, req.(*rpcservicepb.JoinReq).RaftAddr, req.(*rpcservicepb.JoinReq).NodeID)
+				if err != nil {
+					return nil, err
+				}
+				return rsp, nil
+			}
+		}
+	default:
+		return nil, error_code.NoTypeIDError
+	}
+
+}
 
 func (s *Server) Set(ctx context.Context, req *rpcservicepb.SetReq) (*rpcservicepb.SetRsp, error) {
 	if err := s.store.Set(req.Key, req.Value); err != nil {
 		if err == core.ErrNotLeader {
-
+			rsp, err := s.verifyLeaderConnReDial(ctx, req, SetTypeID)
+			if err != nil {
+				return nil, err
+			}
+			return rsp.(*rpcservicepb.SetRsp), nil
 		}
 		return nil, err
 	}
 	return &rpcservicepb.SetRsp{}, nil
 }
 
+func (s *Server) set(ctx context.Context, leaderGrpcAddr, key, value string) (interface{}, error) {
+	var err error
+	s.leaderConn, err = grpc.Dial(leaderGrpcAddr)
+	if err != nil {
+		return nil, err
+	}
+	rpcserviceClient = rpcservicepb.NewRpcServiceClient(s.leaderConn)
+	rsp, err := rpcserviceClient.Set(ctx, &rpcservicepb.SetReq{Key: key, Value: value})
+	if err != nil {
+		return nil, err
+	}
+	return rsp, nil
+}
+
 func (s *Server) Delete(ctx context.Context, req *rpcservicepb.DeleteReq) (*rpcservicepb.DeleteRsp, error) {
-	//TODO
-	return nil, nil
+	if err := s.store.Delete(req.Key); err != nil {
+		if err == core.ErrNotLeader {
+			rsp, err := s.verifyLeaderConnReDial(ctx, req, DeleteTypeID)
+			if err != nil {
+				return nil, err
+			}
+			return rsp.(*rpcservicepb.DeleteRsp), nil
+		}
+		return nil, err
+	}
+	return &rpcservicepb.DeleteRsp{}, nil
+}
+
+func (s *Server) delete(ctx context.Context, leaderGrpcAddr, key string) (interface{}, error) {
+	var err error
+	s.leaderConn, err = grpc.Dial(leaderGrpcAddr)
+	if err != nil {
+		return nil, err
+	}
+	rpcserviceClient = rpcservicepb.NewRpcServiceClient(s.leaderConn)
+	rsp, err := rpcserviceClient.Delete(ctx, &rpcservicepb.DeleteReq{Key: key})
+	if err != nil {
+		return nil, err
+	}
+	return rsp, nil
 }
 
 func (s *Server) Join(ctx context.Context, req *rpcservicepb.JoinReq) (*rpcservicepb.JoinRsp, error) {
-	//TODO
-	return nil, nil
+	if err := s.store.Join(req.NodeID, req.GrpcAddr, req.RaftAddr); err != nil {
+		if err == core.ErrNotLeader {
+			rsp, err := s.verifyLeaderConnReDial(ctx, req, JoinTypeID)
+			if err != nil {
+				return nil, err
+			}
+			return rsp.(*rpcservicepb.JoinRsp), nil
+		}
+		return nil, err
+	}
+	return &rpcservicepb.JoinRsp{}, nil
+}
+
+func (s *Server) join(ctx context.Context, leaderGrpcAddr, grpcAddr, raftAddr, nodeID string) (interface{}, error) {
+	var err error
+	s.leaderConn, err = grpc.Dial(leaderGrpcAddr)
+	if err != nil {
+		return nil, err
+	}
+	rpcserviceClient = rpcservicepb.NewRpcServiceClient(s.leaderConn)
+	rsp, err := rpcserviceClient.Join(ctx, &rpcservicepb.JoinReq{GrpcAddr: grpcAddr, RaftAddr: raftAddr, NodeID: nodeID})
+	if err != nil {
+		return nil, err
+	}
+	return rsp, nil
 }
