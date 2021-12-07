@@ -104,7 +104,7 @@ func (s *Server) Get(ctx context.Context, req *rpcservicepb.GetReq) (*rpcservice
 
 func (s *Server) get(ctx context.Context, leaderGrpcAddr, key string) (*rpcservicepb.GetRsp, error) {
 	var err error
-	s.leaderConn, err = grpc.Dial(leaderGrpcAddr)
+	s.leaderConn, err = grpc.DialContext(ctx, leaderGrpcAddr, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		return nil, err
 	}
@@ -232,7 +232,7 @@ func (s *Server) Set(ctx context.Context, req *rpcservicepb.SetReq) (*rpcservice
 
 func (s *Server) set(ctx context.Context, leaderGrpcAddr, key, value string) (interface{}, error) {
 	var err error
-	s.leaderConn, err = grpc.Dial(leaderGrpcAddr)
+	s.leaderConn, err = grpc.DialContext(ctx, leaderGrpcAddr, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		return nil, err
 	}
@@ -260,7 +260,7 @@ func (s *Server) Delete(ctx context.Context, req *rpcservicepb.DeleteReq) (*rpcs
 
 func (s *Server) delete(ctx context.Context, leaderGrpcAddr, key string) (interface{}, error) {
 	var err error
-	s.leaderConn, err = grpc.Dial(leaderGrpcAddr)
+	s.leaderConn, err = grpc.DialContext(ctx, leaderGrpcAddr, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		return nil, err
 	}
@@ -288,7 +288,7 @@ func (s *Server) Join(ctx context.Context, req *rpcservicepb.JoinReq) (*rpcservi
 
 func (s *Server) join(ctx context.Context, leaderGrpcAddr, grpcAddr, raftAddr, nodeID string) (interface{}, error) {
 	var err error
-	s.leaderConn, err = grpc.Dial(leaderGrpcAddr)
+	s.leaderConn, err = grpc.DialContext(ctx, leaderGrpcAddr, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		return nil, err
 	}

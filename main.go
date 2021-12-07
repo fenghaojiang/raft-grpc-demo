@@ -32,4 +32,8 @@ func main() {
 	if err := s.StartRaft(*joinAddr == ""); err != nil {
 		log.Fatalf("s.StartRaft: %v", err)
 	}
+	if *joinAddr != "" {
+
+	}
+
 }
