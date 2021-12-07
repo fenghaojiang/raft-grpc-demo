@@ -2,15 +2,17 @@ package register
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"google.golang.org/grpc"
 	"io"
-	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
 	"net/url"
+	rpcservicepb "raft-grpc-demo/proto"
 	"strings"
 )
 
@@ -24,16 +26,19 @@ var (
 type CenterForRegister struct {
 	h        *http.Client
 	addr     string
-	services map[string]int64
+	conn     *grpc.ClientConn
+	services map[string]struct{}
 	ln       net.Listener
 	logger   *log.Logger
 }
+
+var rpcClient rpcservicepb.RpcServiceClient
 
 func NewCenterForRegister(addr string) *CenterForRegister {
 	return &CenterForRegister{
 		h:        &http.Client{},
 		addr:     addr,
-		services: map[string]int64{},
+		services: map[string]struct{}{},
 	}
 }
 
@@ -103,7 +108,23 @@ func (c *CenterForRegister) serviceRegister(w http.ResponseWriter, req *http.Req
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		} else {
-			c.services[addr] = 0
+			c.services[addr] = struct{}{}
+			var err error
+			var targetAddr = "static://"
+			var cnt int
+			for serviceAddr := range c.services {
+				targetAddr += serviceAddr
+				cnt++
+				if cnt != len(c.services) {
+					targetAddr += ","
+				}
+			}
+			c.conn, err = grpc.DialContext(context.Background(), targetAddr, grpc.WithInsecure(), grpc.WithBlock(), grpc.WithDefaultServiceConfig("round_robin"))
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			rpcClient = rpcservicepb.NewRpcServiceClient(c.conn)
 			log.Printf("server join addr: %s", addr)
 			w.WriteHeader(http.StatusOK)
 			return
@@ -139,7 +160,7 @@ func (c *CenterForRegister) Start() error {
 }
 
 func (c *CenterForRegister) addService(addr string) {
-	c.services[addr] = 0
+	c.services[addr] = struct{}{}
 }
 
 func (c *CenterForRegister) removeService(addr string) {
@@ -147,32 +168,12 @@ func (c *CenterForRegister) removeService(addr string) {
 }
 
 func (c *CenterForRegister) doGet(key string) (string, error) {
-	for serviceAddr := range c.services {
-		resp, err := c.h.Get(fmt.Sprintf("http://%s/key/%s", serviceAddr, key))
-		if err != nil {
-			log.Println(err.Error())
-			if c.services[serviceAddr] > maxFailOnRequestOnService {
-				c.removeService(serviceAddr)
-			} else {
-				c.services[serviceAddr]++
-			}
-			continue
-		}
-		body, err := ioutil.ReadAll(resp.Body)
-		resp.Body.Close()
-		if err != nil {
-			log.Printf("failed to read response: %s", err)
-			continue
-		}
-		m := map[string]string{}
-		err = json.Unmarshal(body, &m)
-		if err != nil {
-			log.Printf("failed to unmarshal response: %s", err)
-			continue
-		}
-		return m[key], nil
+	rsp, err := rpcClient.Get(context.Background(), &rpcservicepb.GetReq{Key: key})
+	if err != nil {
+		return "", err
 	}
-	return "", ErrNoAvailableService
+
+	return rsp.Value, err
 }
 
 func (c *CenterForRegister) doPost(m map[string]string) error {
