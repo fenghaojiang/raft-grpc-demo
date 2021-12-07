@@ -13,10 +13,9 @@ func init() {
 	resolver.Register(&StaticResolverBuilder{})
 }
 
-func (srb *StaticResolverBuilder) Build(target resolver.Target, cc resolver.ClientConn,
-	opts resolver.BuildOptions) (resolver.Resolver, error) {
+func (srb *StaticResolverBuilder) Build(target resolver.Target, cc resolver.ClientConn, opts resolver.BuildOptions) (resolver.Resolver, error) {
 	// 解析target.Endpoint (例如：localhost:50051,localhost:50052,localhost:50053)
-	endpoints := strings.Split(target.Endpoint, ",")
+	endpoints := strings.Split(target.URL.Path, ",")
 
 	r := &StaticResolver{
 		endpoints: endpoints,
