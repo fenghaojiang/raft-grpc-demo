@@ -4,9 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"google.golang.org/grpc"
 	"io"
 	"log"
 	"net"
@@ -14,17 +12,13 @@ import (
 	"net/url"
 	rpcservicepb "raft-grpc-demo/proto"
 	"strings"
+
+	"google.golang.org/grpc"
 )
 
 const maxFailOnRequestOnService int64 = 5
 
-var (
-	// ErrNoAvailableService is returned when there is no service available
-	ErrNoAvailableService = errors.New("no service available")
-)
-
 type CenterForRegister struct {
-	h        *http.Client
 	addr     string
 	conn     *grpc.ClientConn
 	services map[string]struct{}
@@ -36,7 +30,6 @@ var rpcClient rpcservicepb.RpcServiceClient
 
 func NewCenterForRegister(addr string) *CenterForRegister {
 	return &CenterForRegister{
-		h:        &http.Client{},
 		addr:     addr,
 		services: map[string]struct{}{},
 	}
@@ -198,6 +191,11 @@ func (c *CenterForRegister) doPost(m map[string]string) error {
 	}
 	return ErrNoAvailableService
 
+}
+
+func (c *CenterForRegister) doSet(key string, value string) error {
+
+	return nil
 }
 
 func (c *CenterForRegister) doDelete(key string) {
