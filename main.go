@@ -1,10 +1,15 @@
 package main
 
 import (
+	"context"
 	"flag"
+	"google.golang.org/grpc"
 	"log"
 	"os"
 	"raft-grpc-demo/core"
+	"raft-grpc-demo/grpc_server"
+	rpcservicepb "raft-grpc-demo/proto"
+	"time"
 )
 
 var (
@@ -33,7 +38,43 @@ func main() {
 		log.Fatalf("s.StartRaft: %v", err)
 	}
 	if *joinAddr != "" {
-
+		if err := join(*joinAddr, *grpcAddr, *raftAddr, *raftId); err != nil {
+			log.Fatalf("failed to join node at %s: %s", *joinAddr, err.Error())
+		}
+	} else {
+		log.Println("no join addresses set")
 	}
 
+	// Wait until the store is in full consensus.
+	openTimeout := 120 * time.Second
+	s.WaitForLeader(openTimeout)
+	s.WaitForApplied(openTimeout)
+
+	if err := s.SetMeta(*raftId, *grpcAddr); err != nil && err != core.ErrNotLeader {
+		// Non-leader errors are OK, since metadata will then be set through
+		// consensus as a result of a join. All other errors indicate a problem.
+		log.Fatalf("failed to SetMeta at %s: %s", *raftId, err.Error())
+	}
+
+	server := grpc_server.NewGrpcServer(*grpcAddr, s)
+
+}
+
+func join(joinAddr, grpcAddr, raftAddr, nodeID string) error {
+	ctx := context.Background()
+	cc, err := grpc.DialContext(ctx, grpcAddr, grpc.WithInsecure(), grpc.WithBlock())
+	if err != nil {
+		return err
+	}
+	defer cc.Close()
+	rpcClient := rpcservicepb.NewRpcServiceClient(cc)
+	_, err = rpcClient.Join(ctx, rpcservicepb.JoinReq{
+		GrpcAddr: grpcAddr,
+		RaftAddr: raftAddr,
+		NodeID:   nodeID,
+	})
+	if err != nil {
+		return err
+	}
+	return nil
 }

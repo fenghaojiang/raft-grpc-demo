@@ -2,12 +2,12 @@
 
 raft realization demo using grpc
 
-## Start Raft client
+## Start Raft RegisterCenter
 
 ```shell
 cd ./client/main
-go build -o client
-./client
+go build -o registerCenter
+./registerCenter
 ```
 
 ## Start your own cluster

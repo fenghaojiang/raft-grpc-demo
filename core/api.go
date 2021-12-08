@@ -2,6 +2,7 @@ package core
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/hashicorp/raft"
 )
 
@@ -62,5 +63,51 @@ func (s *Store) Delete(key string) error {
 	return f.Error()
 }
 
+func (s *Store) Join(nodeID, grpcAddr, raftAddr string) error {
+	s.logger.Printf("received join request for remote node %s at %s", nodeID, raftAddr)
+	configuration := s.raft.GetConfiguration()
+	if err := configuration.Error(); err != nil {
+		s.logger.Printf("failed to get raft configuration: %v", err)
+		return err
+	}
+	for _, srv := range configuration.Configuration().Servers {
+		if srv.Address == raft.ServerAddress(raftAddr) && srv.ID == raft.ServerID(nodeID) {
+			s.logger.Printf("node %s at %s already member of cluster, ignoring join request", nodeID, raftAddr)
+			return nil
+		}
 
+		future := s.raft.RemoveServer(srv.ID, 0, 0)
+		if err := future.Error(); err != nil {
+			return fmt.Errorf("error removing existing node %s at %s: %s", nodeID, raftAddr, err)
+		}
 
+	}
+
+	f := s.raft.AddVoter(raft.ServerID(nodeID), raft.ServerAddress(raftAddr), 0, 0)
+	if err := f.Error(); err != nil {
+		return err
+	}
+	if err := s.SetMeta(nodeID, grpcAddr); err != nil {
+		return err
+	}
+
+	s.logger.Printf("node %s at %s joined successfully, http addr is %s", nodeID, raftAddr, grpcAddr)
+
+	return nil
+}
+
+func (s *Store) LeaderAPIAddr() string {
+	id, err := s.LeaderID()
+	if err != nil {
+		return ""
+	}
+
+	s.logger.Printf("Leader id: %s", id)
+
+	grpcAddr, err := s.GetMeta(id)
+	if err != nil {
+		return ""
+	}
+
+	return grpcAddr
+}
