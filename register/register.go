@@ -1,22 +1,17 @@
 package register
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net"
 	"net/http"
-	"net/url"
 	rpcservicepb "raft-grpc-demo/proto"
 	"strings"
 
 	"google.golang.org/grpc"
 )
-
-const maxFailOnRequestOnService int64 = 5
 
 type CenterForRegister struct {
 	addr     string
@@ -68,17 +63,24 @@ func (c *CenterForRegister) ServeHTTP(w http.ResponseWriter, req *http.Request) 
 				w.WriteHeader(http.StatusBadRequest)
 				return
 			}
-			err := c.doPost(m)
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
+			for key := range m {
+				err := c.doSet(key, m[key])
+				if err != nil {
+					w.WriteHeader(http.StatusInternalServerError)
+				}
+				return
 			}
+			w.WriteHeader(http.StatusOK)
 		case "DELETE":
 			k := getKey()
 			if k == "" {
 				w.WriteHeader(http.StatusBadRequest)
 				return
 			}
-			c.doDelete(k)
+			err := c.doDelete(k)
+			if err != nil {
+				io.WriteString(w, err.Error())
+			}
 		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}
@@ -87,6 +89,24 @@ func (c *CenterForRegister) ServeHTTP(w http.ResponseWriter, req *http.Request) 
 	} else {
 		w.WriteHeader(http.StatusNotFound)
 	}
+}
+
+func (c *CenterForRegister) dialRegisteredAddress() error {
+	var err error
+	var targetAddr = "static://"
+	var cnt int
+	for serviceAddr := range c.services {
+		targetAddr += serviceAddr
+		cnt++
+		if cnt != len(c.services) {
+			targetAddr += ","
+		}
+	}
+	c.conn, err = grpc.DialContext(context.Background(), targetAddr, grpc.WithInsecure(), grpc.WithBlock(), grpc.WithDefaultServiceConfig("round_robin"))
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CenterForRegister) serviceRegister(w http.ResponseWriter, req *http.Request) {
@@ -101,18 +121,8 @@ func (c *CenterForRegister) serviceRegister(w http.ResponseWriter, req *http.Req
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		} else {
-			c.services[addr] = struct{}{}
-			var err error
-			var targetAddr = "static://"
-			var cnt int
-			for serviceAddr := range c.services {
-				targetAddr += serviceAddr
-				cnt++
-				if cnt != len(c.services) {
-					targetAddr += ","
-				}
-			}
-			c.conn, err = grpc.DialContext(context.Background(), targetAddr, grpc.WithInsecure(), grpc.WithBlock(), grpc.WithDefaultServiceConfig("round_robin"))
+			c.addService(addr)
+			err := c.dialRegisteredAddress()
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				return
@@ -165,59 +175,27 @@ func (c *CenterForRegister) doGet(key string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
 	return rsp.Value, err
 }
 
-func (c *CenterForRegister) doPost(m map[string]string) error {
-	b, err := json.Marshal(m)
+func (c *CenterForRegister) doSet(key string, value string) error {
+	if rpcClient == nil {
+		rpcClient = rpcservicepb.NewRpcServiceClient(c.conn)
+	}
+	_, err := rpcClient.Set(context.Background(), &rpcservicepb.SetReq{Key: key, Value: value})
 	if err != nil {
-		log.Printf("failed to encode key and value for POST: %s", err)
 		return err
 	}
-	for serviceAddr := range c.services {
-		resp, err := c.h.Post(fmt.Sprintf("http://%s/key", serviceAddr), "application-type/json", bytes.NewReader(b))
-		if err != nil {
-			log.Printf("failed to encode key and value for POST: %s", err)
-			if c.services[serviceAddr] > maxFailOnRequestOnService {
-				c.removeService(serviceAddr)
-			} else {
-				c.services[serviceAddr]++
-			}
-			continue
-		}
-		resp.Body.Close()
-		return nil
-	}
-	return ErrNoAvailableService
-
-}
-
-func (c *CenterForRegister) doSet(key string, value string) error {
-
 	return nil
 }
 
-func (c *CenterForRegister) doDelete(key string) {
-	for serviceAddr := range c.services {
-		ru, err := url.Parse(fmt.Sprintf("http://%s/key/%s", serviceAddr, key))
-		if err != nil {
-			log.Printf("failed to parse URL for delete: %s", err)
-			continue
-		}
-		req := &http.Request{
-			Method: "DELETE",
-			URL:    ru,
-		}
-		resp, err := c.h.Do(req)
-		if err != nil {
-			log.Printf("failed to GET key: %s", err)
-			if c.services[serviceAddr] > maxFailOnRequestOnService {
-				c.removeService(serviceAddr)
-			} else {
-				c.services[serviceAddr]++
-			}
-		}
-		defer resp.Body.Close()
+func (c *CenterForRegister) doDelete(key string) error {
+	if rpcClient == nil {
+		rpcClient = rpcservicepb.NewRpcServiceClient(c.conn)
 	}
+	_, err := rpcClient.Delete(context.Background(), &rpcservicepb.DeleteReq{Key: key})
+	if err != nil {
+		return err
+	}
+	return nil
 }
