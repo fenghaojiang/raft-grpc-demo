@@ -166,6 +166,9 @@ func (c *CenterForRegister) removeService(addr string) {
 }
 
 func (c *CenterForRegister) doGet(key string) (string, error) {
+	if rpcClient == nil {
+		rpcClient = rpcservicepb.NewRpcServiceClient(c.conn)
+	}
 	rsp, err := rpcClient.Get(context.Background(), &rpcservicepb.GetReq{Key: key})
 	if err != nil {
 		return "", err
