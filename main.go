@@ -23,7 +23,7 @@ var (
 	raftDataDir  = flag.String("data", "data/", "raft data dir")
 	raftAddr     = flag.String("raft", "localhost:52000", "raft host:port for this node")
 	joinAddr     = flag.String("join", "", "join address")
-	registerAddr = flag.String("service_join", "localhost:50000", "raft client port")
+	registerAddr = flag.String("service_join", "localhost:50000", "raft register center port")
 )
 
 func main() {
@@ -70,7 +70,7 @@ func main() {
 	}
 	resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		log.Fatalf("join service to client fail %s", err)
+		log.Fatalf("join service to client fail %d", resp.StatusCode)
 	}
 
 	log.Println("started successfully")

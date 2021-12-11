@@ -5,12 +5,16 @@ raft realization demo using grpc
 ## Start Raft RegisterCenter
 
 ```shell
-cd ./client/main
+cd ./register
 go build -o registerCenter
 ./registerCenter
 ```
 
 ## Start your own cluster
+
+```shell
+go build -o raft-demo
+```
 
 ```shell
 ./raft-demo --svc 127.0.0.1:51000 --id node1 --data data/node1 --raft 127.0.0.1:52000 --service_join 127.0.0.1:50000

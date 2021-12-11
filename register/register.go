@@ -102,7 +102,7 @@ func (c *CenterForRegister) dialRegisteredAddress() error {
 			targetAddr += ","
 		}
 	}
-	c.conn, err = grpc.DialContext(context.Background(), targetAddr, grpc.WithInsecure(), grpc.WithBlock(), grpc.WithDefaultServiceConfig("round_robin"))
+	c.conn, err = grpc.DialContext(context.Background(), targetAddr, grpc.WithInsecure(), grpc.WithBlock(), grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"round_robin"}`))
 	if err != nil {
 		return err
 	}
@@ -117,21 +117,16 @@ func (c *CenterForRegister) serviceRegister(w http.ResponseWriter, req *http.Req
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		if addr, ok := m["serviceAddr"]; !ok {
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		} else {
-			c.addService(addr)
-			err := c.dialRegisteredAddress()
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			rpcClient = rpcservicepb.NewRpcServiceClient(c.conn)
-			log.Printf("server join addr: %s", addr)
-			w.WriteHeader(http.StatusOK)
+		addr := m["serviceAddr"]
+		c.addService(addr)
+		err := c.dialRegisteredAddress()
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+		rpcClient = rpcservicepb.NewRpcServiceClient(c.conn)
+		log.Printf("server join addr: %s", addr)
+		w.WriteHeader(http.StatusOK)
 	default:
 		w.WriteHeader(http.StatusServiceUnavailable)
 	}
