@@ -102,7 +102,7 @@ func (c *CenterForRegister) dialRegisteredAddress() error {
 			targetAddr += ","
 		}
 	}
-	c.conn, err = grpc.DialContext(context.Background(), targetAddr, grpc.WithInsecure(), grpc.WithBlock(), grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"round_robin"}`))
+	c.conn, err = grpc.DialContext(context.Background(), targetAddr, grpc.WithInsecure(), grpc.WithBlock(), grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"pick_first"}`))
 	if err != nil {
 		return err
 	}
