@@ -3,12 +3,15 @@ package register
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net"
 	"net/http"
+	"raft-grpc-demo/error_code"
 	rpcservicepb "raft-grpc-demo/proto"
 	"strings"
+	"time"
 
 	"google.golang.org/grpc"
 )
@@ -102,9 +105,15 @@ func (c *CenterForRegister) dialRegisteredAddress() error {
 			targetAddr += ","
 		}
 	}
-	c.conn, err = grpc.DialContext(context.Background(), targetAddr, grpc.WithInsecure(), grpc.WithBlock(), grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"pick_first"}`))
+	timeCtx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	c.conn, err = grpc.DialContext(timeCtx, targetAddr, grpc.WithInsecure(), grpc.WithBlock(), grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"round_robin"}`))
 	if err != nil {
 		return err
+	}
+	if c.conn == nil {
+		fmt.Println("dial ", targetAddr, "fail")
+		return error_code.ErrNoAvailableService
 	}
 	return nil
 }
@@ -166,6 +175,12 @@ func (c *CenterForRegister) removeService(addr string) {
 }
 
 func (c *CenterForRegister) doGet(key string) (string, error) {
+	if c.conn == nil {
+		err := c.dialRegisteredAddress()
+		if err != nil {
+			return "", err
+		}
+	}
 	if rpcClient == nil {
 		rpcClient = rpcservicepb.NewRpcServiceClient(c.conn)
 	}

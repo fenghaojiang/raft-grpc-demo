@@ -17,11 +17,11 @@ go build -o raft-demo
 ```
 
 ```shell
-./raft-demo --svc 127.0.0.1:51000 --id node1 --data data/node1 --raft 127.0.0.1:52000 --service_join 127.0.0.1:50000
+./raft-demo --svc localhost:51000 --id node1 --data data/node1 --raft localhost:52000 --service_join localhost:50000
 
-./raft-demo --svc 127.0.0.1:51001 --id node2 --data data/node2 --raft 127.0.0.1:52001 --join 127.0.0.1:51000 --service_join 127.0.0.1:50000
+./raft-demo --svc localhost:51001 --id node2 --data data/node2 --raft localhost:52001 --join localhost:51000 --service_join localhost:50000
 
-./raft-demo --svc 127.0.0.1:51002 --id node3 --data data/node3 --raft 127.0.0.1:52002 --join 127.0.0.1:51000 --service_join 127.0.0.1:50000
+./raft-demo --svc localhost:51002 --id node3 --data data/node3 --raft localhost:52002 --join localhost:51000 --service_join localhost:50000
 ```
 
 ## Reference

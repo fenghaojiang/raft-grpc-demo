@@ -8,6 +8,7 @@ import (
 	"raft-grpc-demo/core"
 	"raft-grpc-demo/error_code"
 	rpcservicepb "raft-grpc-demo/proto"
+	"time"
 
 	"google.golang.org/grpc"
 )
@@ -54,10 +55,10 @@ var rpcserviceClient rpcservicepb.RpcServiceClient
 
 func NewGrpcServerAndStart(addr string, api StoreApi) {
 	grpcSrv := grpc.NewServer()
-	ln, err := net.Listen("tcp", addr)
+	network := "tcp"
+	ln, err := net.Listen(network, addr)
 	srv := NewServer(api, addr, ln)
 	rpcservicepb.RegisterRpcServiceServer(grpcSrv, srv)
-	network := "tcp"
 	if err != nil {
 		log.Panicf("listen to network %s, address %s failed", network, addr)
 	}
@@ -103,12 +104,14 @@ func (s *Server) Get(ctx context.Context, req *rpcservicepb.GetReq) (*rpcservice
 
 func (s *Server) get(ctx context.Context, leaderGrpcAddr, key string) (*rpcservicepb.GetRsp, error) {
 	var err error
-	s.leaderConn, err = grpc.DialContext(ctx, leaderGrpcAddr, grpc.WithInsecure(), grpc.WithBlock())
+	timeCtx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	defer cancel()
+	s.leaderConn, err = grpc.DialContext(timeCtx, leaderGrpcAddr, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		return nil, err
 	}
 	rpcserviceClient = rpcservicepb.NewRpcServiceClient(s.leaderConn)
-	rsp, err := rpcserviceClient.Get(ctx, &rpcservicepb.GetReq{Key: key})
+	rsp, err := rpcserviceClient.Get(timeCtx, &rpcservicepb.GetReq{Key: key})
 	if err != nil {
 		return nil, err
 	}
@@ -231,12 +234,14 @@ func (s *Server) Set(ctx context.Context, req *rpcservicepb.SetReq) (*rpcservice
 
 func (s *Server) set(ctx context.Context, leaderGrpcAddr, key, value string) (interface{}, error) {
 	var err error
-	s.leaderConn, err = grpc.DialContext(ctx, leaderGrpcAddr, grpc.WithInsecure(), grpc.WithBlock())
+	timeCtx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	defer cancel()
+	s.leaderConn, err = grpc.DialContext(timeCtx, leaderGrpcAddr, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		return nil, err
 	}
 	rpcserviceClient = rpcservicepb.NewRpcServiceClient(s.leaderConn)
-	rsp, err := rpcserviceClient.Set(ctx, &rpcservicepb.SetReq{Key: key, Value: value})
+	rsp, err := rpcserviceClient.Set(timeCtx, &rpcservicepb.SetReq{Key: key, Value: value})
 	if err != nil {
 		return nil, err
 	}
@@ -259,12 +264,14 @@ func (s *Server) Delete(ctx context.Context, req *rpcservicepb.DeleteReq) (*rpcs
 
 func (s *Server) delete(ctx context.Context, leaderGrpcAddr, key string) (interface{}, error) {
 	var err error
-	s.leaderConn, err = grpc.DialContext(ctx, leaderGrpcAddr, grpc.WithInsecure(), grpc.WithBlock())
+	timeCtx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	defer cancel()
+	s.leaderConn, err = grpc.DialContext(timeCtx, leaderGrpcAddr, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		return nil, err
 	}
 	rpcserviceClient = rpcservicepb.NewRpcServiceClient(s.leaderConn)
-	rsp, err := rpcserviceClient.Delete(ctx, &rpcservicepb.DeleteReq{Key: key})
+	rsp, err := rpcserviceClient.Delete(timeCtx, &rpcservicepb.DeleteReq{Key: key})
 	if err != nil {
 		return nil, err
 	}
@@ -287,12 +294,14 @@ func (s *Server) Join(ctx context.Context, req *rpcservicepb.JoinReq) (*rpcservi
 
 func (s *Server) join(ctx context.Context, leaderGrpcAddr, grpcAddr, raftAddr, nodeID string) (interface{}, error) {
 	var err error
-	s.leaderConn, err = grpc.DialContext(ctx, leaderGrpcAddr, grpc.WithInsecure(), grpc.WithBlock())
+	timeCtx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	defer cancel()
+	s.leaderConn, err = grpc.DialContext(timeCtx, leaderGrpcAddr, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		return nil, err
 	}
 	rpcserviceClient = rpcservicepb.NewRpcServiceClient(s.leaderConn)
-	rsp, err := rpcserviceClient.Join(ctx, &rpcservicepb.JoinReq{GrpcAddr: grpcAddr, RaftAddr: raftAddr, NodeID: nodeID})
+	rsp, err := rpcserviceClient.Join(timeCtx, &rpcservicepb.JoinReq{GrpcAddr: grpcAddr, RaftAddr: raftAddr, NodeID: nodeID})
 	if err != nil {
 		return nil, err
 	}

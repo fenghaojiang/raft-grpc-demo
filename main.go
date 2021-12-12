@@ -84,13 +84,15 @@ func main() {
 
 func join(joinAddr, grpcAddr, raftAddr, nodeID string) error {
 	ctx := context.Background()
-	cc, err := grpc.DialContext(ctx, grpcAddr, grpc.WithInsecure(), grpc.WithBlock())
+	timeCtx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	defer cancel()
+	cc, err := grpc.DialContext(timeCtx, grpcAddr, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		return err
 	}
 	defer cc.Close()
 	rpcClient := rpcservicepb.NewRpcServiceClient(cc)
-	_, err = rpcClient.Join(ctx, &rpcservicepb.JoinReq{
+	_, err = rpcClient.Join(timeCtx, &rpcservicepb.JoinReq{
 		GrpcAddr: grpcAddr,
 		RaftAddr: raftAddr,
 		NodeID:   nodeID,
