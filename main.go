@@ -86,7 +86,7 @@ func join(joinAddr, grpcAddr, raftAddr, nodeID string) error {
 	ctx := context.Background()
 	timeCtx, cancel := context.WithTimeout(ctx, 2*time.Second)
 	defer cancel()
-	cc, err := grpc.DialContext(timeCtx, grpcAddr, grpc.WithInsecure(), grpc.WithBlock())
+	cc, err := grpc.DialContext(timeCtx, joinAddr, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		return err
 	}
