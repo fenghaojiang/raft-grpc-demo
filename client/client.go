@@ -9,7 +9,7 @@ import (
 	"net/url"
 )
 
-const registerCenterAddr = "127.0.0.1:50000"
+const registerCenterAddr = "127.0.0.1:60000"
 
 func DoGet(key string) string {
 	resp, err := http.Get(fmt.Sprintf("http://%s/key/%s", registerCenterAddr, key))

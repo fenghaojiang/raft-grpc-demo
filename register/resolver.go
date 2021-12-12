@@ -14,7 +14,7 @@ func init() {
 }
 
 func (srb *StaticResolverBuilder) Build(target resolver.Target, cc resolver.ClientConn, opts resolver.BuildOptions) (resolver.Resolver, error) {
-	// 解析target.Endpoint (例如：localhost:50051,localhost:50052,localhost:50053)
+	// 解析target.URL.Path (例如：localhost:50051,localhost:50052,localhost:50053)
 	endpoints := strings.Split(target.URL.Path, ",")
 
 	r := &StaticResolver{

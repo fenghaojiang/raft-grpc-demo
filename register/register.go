@@ -96,7 +96,24 @@ func (c *CenterForRegister) ServeHTTP(w http.ResponseWriter, req *http.Request) 
 
 func (c *CenterForRegister) dialRegisteredAddress() error {
 	var err error
-	var targetAddr = "static://"
+	var targetAddr = ""
+	if len(c.services) == 1 {
+		for serviceAddr := range c.services {
+			targetAddr += serviceAddr
+		}
+		timeCtx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		defer cancel()
+		c.conn, err = grpc.DialContext(timeCtx, targetAddr, grpc.WithInsecure(), grpc.WithBlock(), grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"pick_first"}`))
+		if err != nil {
+			return err
+		}
+		if c.conn == nil {
+			fmt.Println("dial ", targetAddr, "fail")
+			return error_code.ErrNoAvailableService
+		}
+		return nil
+	}
+	targetAddr = "static:///"
 	var cnt int
 	for serviceAddr := range c.services {
 		targetAddr += serviceAddr
@@ -105,9 +122,10 @@ func (c *CenterForRegister) dialRegisteredAddress() error {
 			targetAddr += ","
 		}
 	}
+	fmt.Println(targetAddr)
 	timeCtx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	c.conn, err = grpc.DialContext(timeCtx, targetAddr, grpc.WithInsecure(), grpc.WithBlock(), grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"round_robin"}`))
+	c.conn, err = grpc.DialContext(timeCtx, targetAddr, grpc.WithInsecure(), grpc.WithBlock(), grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"pick_first"}`))
 	if err != nil {
 		return err
 	}
