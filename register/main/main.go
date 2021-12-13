@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	registerCenter := register.NewCenterForRegister(":60000")
+	registerCenter := register.NewCenterForRegister(":50000")
 	err := registerCenter.Start()
 	if err != nil {
 		log.Fatalf("raft register center start fail")

@@ -71,16 +71,17 @@ func (s *Store) Join(nodeID, grpcAddr, raftAddr string) error {
 		return err
 	}
 	for _, srv := range configuration.Configuration().Servers {
-		if srv.Address == raft.ServerAddress(raftAddr) && srv.ID == raft.ServerID(nodeID) {
-			s.logger.Printf("node %s at %s already member of cluster, ignoring join request", nodeID, raftAddr)
-			return nil
-		}
+		if srv.ID == raft.ServerID(nodeID) || srv.Address == raft.ServerAddress(raftAddr) {
+			if srv.Address == raft.ServerAddress(raftAddr) && srv.ID == raft.ServerID(nodeID) {
+				s.logger.Printf("node %s at %s already member of cluster, ignoring join request", nodeID, raftAddr)
+				return nil
+			}
 
-		future := s.raft.RemoveServer(srv.ID, 0, 0)
-		if err := future.Error(); err != nil {
-			return fmt.Errorf("error removing existing node %s at %s: %s", nodeID, raftAddr, err)
+			future := s.raft.RemoveServer(srv.ID, 0, 0)
+			if err := future.Error(); err != nil {
+				return fmt.Errorf("error removing existing node %s at %s: %s", nodeID, raftAddr, err)
+			}
 		}
-
 	}
 
 	f := s.raft.AddVoter(raft.ServerID(nodeID), raft.ServerAddress(raftAddr), 0, 0)
