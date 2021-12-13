@@ -2,9 +2,6 @@
 
 raft realization demo using grpc   
 
-
-[![Go Report Card](https://goreportcard.com/badge/github.com/fenghaojiang/raft-grcp-demo)](https://goreportcard.com/report/github.com/fenghaojiang/raft-grcp-demo)
-
 ## Start Raft RegisterCenter
 
 registerCenter --- localhost:60000
