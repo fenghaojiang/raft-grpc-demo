@@ -61,7 +61,9 @@ func main() {
 		log.Fatalf("failed to SetMeta at %s: %s", *raftId, err.Error())
 	}
 
-	grpc_server.NewGrpcServerAndStart(*grpcAddr, s)
+	if err := grpc_server.NewGrpcServerAndStart(*grpcAddr, s); err != nil {
+		log.Panicf("listen to network address %s failed", *grpcAddr)
+	}
 
 	b, err := json.Marshal(map[string]string{"serviceAddr": *grpcAddr})
 	resp, err := http.Post(fmt.Sprintf("http://%s/service_join", *registerAddr), "application-type/json", bytes.NewReader(b))

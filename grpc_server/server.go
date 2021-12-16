@@ -53,20 +53,21 @@ type Server struct {
 var _ rpcservicepb.RpcServiceServer = (*Server)(nil) // 检查是否实现所有方法
 var rpcserviceClient rpcservicepb.RpcServiceClient
 
-func NewGrpcServerAndStart(addr string, api StoreApi) {
+func NewGrpcServerAndStart(addr string, api StoreApi) error {
 	grpcSrv := grpc.NewServer()
 	network := "tcp"
 	ln, err := net.Listen(network, addr)
 	srv := NewServer(api, addr, ln)
 	rpcservicepb.RegisterRpcServiceServer(grpcSrv, srv)
 	if err != nil {
-		log.Panicf("listen to network %s, address %s failed", network, addr)
+		return err
 	}
 	go func() {
 		if err := grpcSrv.Serve(ln); err != nil {
 			log.Panic("socket listener accept net conn failed", err.Error())
 		}
 	}()
+	return nil
 }
 
 func (s *Server) Close() {
