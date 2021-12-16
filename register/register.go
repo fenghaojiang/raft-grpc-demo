@@ -8,6 +8,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
 	"raft-grpc-demo/error_code"
 	rpcservicepb "raft-grpc-demo/proto"
 	"strings"
@@ -30,6 +31,7 @@ func NewCenterForRegister(addr string) *CenterForRegister {
 	return &CenterForRegister{
 		addr:     addr,
 		services: map[string]struct{}{},
+		logger: log.New(os.Stderr, "[RegisterCenter Service]", log.LstdFlags),
 	}
 }
 
@@ -51,11 +53,13 @@ func (c *CenterForRegister) ServeHTTP(w http.ResponseWriter, req *http.Request) 
 			}
 			v, err := c.doGet(k)
 			if err != nil {
+				c.logger.Printf("get key %s fail %v", k, err)
 				w.WriteHeader(http.StatusBadRequest)
 				return
 			}
 			b, err := json.Marshal(map[string]string{k: v})
 			if err != nil {
+				c.logger.Printf("marshal key %s fail %v", k, err)
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
@@ -69,6 +73,7 @@ func (c *CenterForRegister) ServeHTTP(w http.ResponseWriter, req *http.Request) 
 			for key := range m {
 				err := c.doSet(key, m[key])
 				if err != nil {
+					c.logger.Printf("set key %s fail %v", key, err)
 					w.WriteHeader(http.StatusInternalServerError)
 				}
 				return
@@ -82,6 +87,7 @@ func (c *CenterForRegister) ServeHTTP(w http.ResponseWriter, req *http.Request) 
 			}
 			err := c.doDelete(k)
 			if err != nil {
+				c.logger.Printf("delete key %s fail %v", k, err)
 				io.WriteString(w, err.Error())
 			}
 		default:

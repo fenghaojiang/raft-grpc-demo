@@ -21,7 +21,7 @@ func DoGet(key string) string {
 	if err != nil {
 		fmt.Println("failed to read response:", err.Error())
 	}
-	//TODO bad request
+	fmt.Println("status code: ", resp.StatusCode)
 	return string(body)
 }
 
@@ -34,6 +34,7 @@ func DoSet(key, value string) {
 	if err != nil {
 		fmt.Println("POST request failed: ", err.Error())
 	}
+	fmt.Println("status code: ", resp.StatusCode)
 	defer resp.Body.Close()
 }
 
@@ -46,11 +47,11 @@ func DoDelete(key string) {
 		Method: "DELETE",
 		URL:    ru,
 	}
-
 	client := http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println("failed to GET key:", err.Error())
 	}
+	fmt.Println("status code: ", resp.StatusCode)
 	defer resp.Body.Close()
 }

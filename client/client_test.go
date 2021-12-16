@@ -13,7 +13,7 @@ func TestOnApi(t *testing.T) {
 		res := DoGet("test")
 		m := map[string]string{}
 		json.Unmarshal([]byte(res), &m)
-		//assert.Equal(t, "", m["test"])
+		assert.Equal(t, "", m["test"])
 
 		DoSet("test", "value")
 
@@ -30,9 +30,14 @@ func TestOnApi(t *testing.T) {
 	})
 
 	t.Run("test on Api2", func(t *testing.T) {
-		res := DoGet("2")
+		res := DoGet("test")
 		m := map[string]string{}
 		json.Unmarshal([]byte(res), &m)
-		assert.Equal(t, "", m["2"])
+		assert.Equal(t, "", m["test"])
+
+		DoSet("test", "testvalue")
+		res = DoGet("test")
+		assert.Equal(t, "testvalue", "test")
+
 	})
 }
