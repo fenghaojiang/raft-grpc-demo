@@ -4,7 +4,7 @@ raft realization demo using grpc
 
 ## Start Raft RegisterCenter
 
-registerCenter --- localhost:50000
+registerCenter --- 127.0.0.1:50000
 
 ```shell
 cd ./register

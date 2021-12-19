@@ -31,7 +31,7 @@ func NewCenterForRegister(addr string) *CenterForRegister {
 	return &CenterForRegister{
 		addr:     addr,
 		services: map[string]struct{}{},
-		logger: log.New(os.Stderr, "[RegisterCenter Service]", log.LstdFlags),
+		logger:   log.New(os.Stderr, "[RegisterCenter Service]", log.LstdFlags),
 	}
 }
 
