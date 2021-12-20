@@ -36,3 +36,20 @@ https://github.com/hanj4096/raftdb
 <br>
 https://github.com/HelKim/raft-demo
 <br>
+
+
+
+## Go Report Card Score  
+
+```
+Grade: A (80.9%)
+Files: 12
+Issues: 8
+gofmt: 83%
+go_vet: 100%
+gocyclo: 91%
+golint: 50%
+license: 0%
+ineffassign: 91%
+misspell: 0%
+```
