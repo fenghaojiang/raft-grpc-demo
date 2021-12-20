@@ -9,7 +9,7 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"raft-grpc-demo/error_code"
+	"raft-grpc-demo/ecode"
 	rpcservicepb "raft-grpc-demo/proto"
 	"strings"
 	"time"
@@ -17,7 +17,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-type CenterForRegister struct {
+type centerForRegister struct {
 	addr     string
 	conn     *grpc.ClientConn
 	services map[string]struct{}
@@ -27,15 +27,15 @@ type CenterForRegister struct {
 
 var rpcClient rpcservicepb.RpcServiceClient
 
-func NewCenterForRegister(addr string) *CenterForRegister {
-	return &CenterForRegister{
+func NewCenterForRegister(addr string) *centerForRegister {
+	return &centerForRegister{
 		addr:     addr,
 		services: map[string]struct{}{},
 		logger:   log.New(os.Stderr, "[RegisterCenter Service]", log.LstdFlags),
 	}
 }
 
-func (c *CenterForRegister) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+func (c *centerForRegister) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	getKey := func() string {
 		parts := strings.Split(req.URL.Path, "/")
 		if len(parts) != 3 {
@@ -100,7 +100,7 @@ func (c *CenterForRegister) ServeHTTP(w http.ResponseWriter, req *http.Request) 
 	}
 }
 
-func (c *CenterForRegister) dialRegisteredAddress() error {
+func (c *centerForRegister) dialRegisteredAddress() error {
 	var err error
 	var targetAddr = ""
 	if len(c.services) == 1 {
@@ -115,7 +115,7 @@ func (c *CenterForRegister) dialRegisteredAddress() error {
 		}
 		if c.conn == nil {
 			fmt.Println("dial ", targetAddr, "fail")
-			return error_code.ErrNoAvailableService
+			return ecode.ErrNoAvailableService
 		}
 		return nil
 	}
@@ -137,12 +137,12 @@ func (c *CenterForRegister) dialRegisteredAddress() error {
 	}
 	if c.conn == nil {
 		fmt.Println("dial ", targetAddr, "fail")
-		return error_code.ErrNoAvailableService
+		return ecode.ErrNoAvailableService
 	}
 	return nil
 }
 
-func (c *CenterForRegister) serviceRegister(w http.ResponseWriter, req *http.Request) {
+func (c *centerForRegister) serviceRegister(w http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case "POST":
 		m := map[string]string{}
@@ -166,7 +166,7 @@ func (c *CenterForRegister) serviceRegister(w http.ResponseWriter, req *http.Req
 
 }
 
-func (c *CenterForRegister) Start() error {
+func (c *centerForRegister) Start() error {
 	if len(c.addr) == 0 {
 		log.Fatalf("raft client addr is required")
 	}
@@ -190,15 +190,15 @@ func (c *CenterForRegister) Start() error {
 	return nil
 }
 
-func (c *CenterForRegister) addService(addr string) {
+func (c *centerForRegister) addService(addr string) {
 	c.services[addr] = struct{}{}
 }
 
-func (c *CenterForRegister) removeService(addr string) {
+func (c *centerForRegister) removeService(addr string) {
 	delete(c.services, addr)
 }
 
-func (c *CenterForRegister) doGet(key string) (string, error) {
+func (c *centerForRegister) doGet(key string) (string, error) {
 	if c.conn == nil {
 		err := c.dialRegisteredAddress()
 		if err != nil {
@@ -215,7 +215,7 @@ func (c *CenterForRegister) doGet(key string) (string, error) {
 	return rsp.Value, err
 }
 
-func (c *CenterForRegister) doSet(key string, value string) error {
+func (c *centerForRegister) doSet(key string, value string) error {
 	if rpcClient == nil {
 		rpcClient = rpcservicepb.NewRpcServiceClient(c.conn)
 	}
@@ -226,7 +226,7 @@ func (c *CenterForRegister) doSet(key string, value string) error {
 	return nil
 }
 
-func (c *CenterForRegister) doDelete(key string) error {
+func (c *centerForRegister) doDelete(key string) error {
 	if rpcClient == nil {
 		rpcClient = rpcservicepb.NewRpcServiceClient(c.conn)
 	}

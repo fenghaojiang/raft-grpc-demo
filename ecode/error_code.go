@@ -1,4 +1,4 @@
-package error_code
+package ecode
 
 import "errors"
 

@@ -11,7 +11,7 @@ import (
 
 const registerCenterAddr = "127.0.0.1:50000"
 
-func DoGet(key string) string {
+func doGet(key string) string {
 	resp, err := http.Get(fmt.Sprintf("http://%s/key/%s", registerCenterAddr, key))
 	if err != nil {
 		fmt.Println("failed to GET key:", err.Error())
@@ -25,7 +25,7 @@ func DoGet(key string) string {
 	return string(body)
 }
 
-func DoSet(key, value string) {
+func doSet(key, value string) {
 	b, err := json.Marshal(map[string]string{key: value})
 	if err != nil {
 		fmt.Println("failed to encode key and value for POST:", err.Error())
@@ -38,7 +38,7 @@ func DoSet(key, value string) {
 	defer resp.Body.Close()
 }
 
-func DoDelete(key string) {
+func doDelete(key string) {
 	ru, err := url.Parse(fmt.Sprintf("http://%s/key/%s", registerCenterAddr, key))
 	if err != nil {
 		fmt.Println("failed to parse URL for delete:", err.Error())

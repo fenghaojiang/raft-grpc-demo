@@ -89,7 +89,13 @@ func (s *Store) StartRaft(bootstrap bool) error {
 	}
 
 	addr, err := net.ResolveTCPAddr("tcp", s.RaftAddr)
+	if err != nil {
+		return fmt.Errorf(`raft.ResolveTCPAddr %q fail %v`, s.RaftDataDir, err)
+	}
 	transport, err := raft.NewTCPTransport(s.RaftAddr, addr, 3, 10*time.Second, os.Stderr)
+	if err != nil {
+		return fmt.Errorf(`raft.NewTCPTransport fail %q %v`, s.RaftDataDir, err)
+	}
 
 	ra, err := raft.NewRaft(c, (*fsm)(s), logdb, stabledb, fss, transport)
 	if err != nil {

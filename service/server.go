@@ -1,4 +1,4 @@
-package grpc_server
+package service
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"net"
 	"os"
 	"raft-grpc-demo/core"
-	"raft-grpc-demo/error_code"
+	"raft-grpc-demo/ecode"
 	rpcservicepb "raft-grpc-demo/proto"
 	"time"
 
@@ -76,7 +76,7 @@ func (s *Server) Close() {
 
 func (s *Server) Get(ctx context.Context, req *rpcservicepb.GetReq) (*rpcservicepb.GetRsp, error) {
 	if req.Key == "" {
-		return nil, error_code.BadRequest
+		return nil, ecode.BadRequest
 	}
 	var consLv core.ConsistencyLevel
 	switch req.Level {
@@ -98,7 +98,7 @@ func (s *Server) Get(ctx context.Context, req *rpcservicepb.GetReq) (*rpcservice
 			}
 			return rsp.(*rpcservicepb.GetRsp), nil
 		}
-		return nil, error_code.InternalServerError
+		return nil, ecode.InternalServerError
 	}
 	return &rpcservicepb.GetRsp{Value: value}, nil
 }
@@ -122,7 +122,7 @@ func (s *Server) get(ctx context.Context, leaderGrpcAddr, key string) (*rpcservi
 func (s *Server) verifyLeaderConnReDial(ctx context.Context, req interface{}, typeID int64) (interface{}, error) {
 	leaderGrpcAddr := s.store.LeaderAPIAddr()
 	if leaderGrpcAddr == "" {
-		return nil, error_code.ServiceUnavailable
+		return nil, ecode.ServiceUnavailable
 	}
 	switch typeID {
 	case GetTypeID:
@@ -214,7 +214,7 @@ func (s *Server) verifyLeaderConnReDial(ctx context.Context, req interface{}, ty
 			}
 		}
 	default:
-		return nil, error_code.NoTypeIDError
+		return nil, ecode.NoTypeIDError
 	}
 
 }

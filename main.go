@@ -12,7 +12,7 @@ import (
 	"os"
 	"os/signal"
 	"raft-grpc-demo/core"
-	"raft-grpc-demo/grpc_server"
+	"raft-grpc-demo/service"
 	rpcservicepb "raft-grpc-demo/proto"
 	"time"
 )
@@ -61,7 +61,7 @@ func main() {
 		log.Fatalf("failed to SetMeta at %s: %s", *raftId, err.Error())
 	}
 
-	if err := grpc_server.NewGrpcServerAndStart(*grpcAddr, s); err != nil {
+	if err := service.NewGrpcServerAndStart(*grpcAddr, s); err != nil {
 		log.Panicf("listen to network address %s failed", *grpcAddr)
 	}
 
