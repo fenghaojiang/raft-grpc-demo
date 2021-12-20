@@ -13,6 +13,7 @@ import (
 	"google.golang.org/grpc"
 )
 
+//StoreApi is interface declaration. Its realization is in core/api.go
 type StoreApi interface {
 	Get(key string, level core.ConsistencyLevel) (string, error)
 
@@ -132,21 +133,21 @@ func (s *Server) verifyLeaderConnReDial(ctx context.Context, req interface{}, ty
 				return nil, err
 			}
 			return rsp, err
-		} else {
-			if leaderGrpcAddr == s.leaderConn.Target() {
-				rsp, err := rpcserviceClient.Get(ctx, req.(*rpcservicepb.GetReq))
-				if err != nil {
-					return nil, err
-				}
-				return rsp, nil
-			} else {
-				rsp, err := s.get(ctx, leaderGrpcAddr, req.(*rpcservicepb.GetReq).Key)
-				if err != nil {
-					return nil, err
-				}
-				return rsp, nil
-			}
 		}
+		if leaderGrpcAddr == s.leaderConn.Target() {
+			rsp, err := rpcserviceClient.Get(ctx, req.(*rpcservicepb.GetReq))
+			if err != nil {
+				return nil, err
+			}
+			return rsp, nil
+		} else {
+			rsp, err := s.get(ctx, leaderGrpcAddr, req.(*rpcservicepb.GetReq).Key)
+			if err != nil {
+				return nil, err
+			}
+			return rsp, nil
+		}
+
 	case SetTypeID:
 		if s.leaderConn == nil {
 			rsp, err := s.set(ctx, leaderGrpcAddr, req.(*rpcservicepb.SetReq).Key, req.(*rpcservicepb.SetReq).Value)
@@ -154,21 +155,21 @@ func (s *Server) verifyLeaderConnReDial(ctx context.Context, req interface{}, ty
 				return nil, err
 			}
 			return rsp, err
-		} else {
-			if leaderGrpcAddr == s.leaderConn.Target() {
-				rsp, err := rpcserviceClient.Set(ctx, req.(*rpcservicepb.SetReq))
-				if err != nil {
-					return nil, err
-				}
-				return rsp, nil
-			} else {
-				rsp, err := s.set(ctx, leaderGrpcAddr, req.(*rpcservicepb.SetReq).Key, req.(*rpcservicepb.SetReq).Value)
-				if err != nil {
-					return nil, err
-				}
-				return rsp, nil
-			}
 		}
+		if leaderGrpcAddr == s.leaderConn.Target() {
+			rsp, err := rpcserviceClient.Set(ctx, req.(*rpcservicepb.SetReq))
+			if err != nil {
+				return nil, err
+			}
+			return rsp, nil
+		} else {
+			rsp, err := s.set(ctx, leaderGrpcAddr, req.(*rpcservicepb.SetReq).Key, req.(*rpcservicepb.SetReq).Value)
+			if err != nil {
+				return nil, err
+			}
+			return rsp, nil
+		}
+
 	case DeleteTypeID:
 		if s.leaderConn == nil {
 			rsp, err := s.delete(ctx, leaderGrpcAddr, req.(*rpcservicepb.DeleteReq).Key)
@@ -176,21 +177,21 @@ func (s *Server) verifyLeaderConnReDial(ctx context.Context, req interface{}, ty
 				return nil, err
 			}
 			return rsp, err
-		} else {
-			if leaderGrpcAddr == s.leaderConn.Target() {
-				rsp, err := rpcserviceClient.Delete(ctx, req.(*rpcservicepb.DeleteReq))
-				if err != nil {
-					return nil, err
-				}
-				return rsp, nil
-			} else {
-				rsp, err := s.delete(ctx, leaderGrpcAddr, req.(*rpcservicepb.DeleteReq).Key)
-				if err != nil {
-					return nil, err
-				}
-				return rsp, nil
-			}
 		}
+		if leaderGrpcAddr == s.leaderConn.Target() {
+			rsp, err := rpcserviceClient.Delete(ctx, req.(*rpcservicepb.DeleteReq))
+			if err != nil {
+				return nil, err
+			}
+			return rsp, nil
+		} else {
+			rsp, err := s.delete(ctx, leaderGrpcAddr, req.(*rpcservicepb.DeleteReq).Key)
+			if err != nil {
+				return nil, err
+			}
+			return rsp, nil
+		}
+
 	case JoinTypeID:
 		if s.leaderConn == nil {
 			rsp, err := s.join(ctx, leaderGrpcAddr, req.(*rpcservicepb.JoinReq).GrpcAddr, req.(*rpcservicepb.JoinReq).RaftAddr, req.(*rpcservicepb.JoinReq).NodeID)
@@ -198,20 +199,19 @@ func (s *Server) verifyLeaderConnReDial(ctx context.Context, req interface{}, ty
 				return nil, err
 			}
 			return rsp, err
-		} else {
-			if leaderGrpcAddr == s.leaderConn.Target() {
-				rsp, err := rpcserviceClient.Join(ctx, req.(*rpcservicepb.JoinReq))
-				if err != nil {
-					return nil, err
-				}
-				return rsp, nil
-			} else {
-				rsp, err := s.join(ctx, leaderGrpcAddr, req.(*rpcservicepb.JoinReq).GrpcAddr, req.(*rpcservicepb.JoinReq).RaftAddr, req.(*rpcservicepb.JoinReq).NodeID)
-				if err != nil {
-					return nil, err
-				}
-				return rsp, nil
+		}
+		if leaderGrpcAddr == s.leaderConn.Target() {
+			rsp, err := rpcserviceClient.Join(ctx, req.(*rpcservicepb.JoinReq))
+			if err != nil {
+				return nil, err
 			}
+			return rsp, nil
+		} else {
+			rsp, err := s.join(ctx, leaderGrpcAddr, req.(*rpcservicepb.JoinReq).GrpcAddr, req.(*rpcservicepb.JoinReq).RaftAddr, req.(*rpcservicepb.JoinReq).NodeID)
+			if err != nil {
+				return nil, err
+			}
+			return rsp, nil
 		}
 	default:
 		return nil, ecode.NoTypeIDError

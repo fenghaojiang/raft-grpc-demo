@@ -27,6 +27,7 @@ type centerForRegister struct {
 
 var rpcClient rpcservicepb.RpcServiceClient
 
+//NewCenterForRegister initialize registerCenter
 func NewCenterForRegister(addr string) *centerForRegister {
 	return &centerForRegister{
 		addr:     addr,

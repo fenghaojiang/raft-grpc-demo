@@ -1,6 +1,8 @@
 package ecode
 
-import "errors"
+import (
+	"errors"
+)
 
 var (
 	BadRequest            = errors.New("bad request")
@@ -10,3 +12,13 @@ var (
 	NoTypeIDError         = errors.New("no type id ")
 	ErrNoAvailableService = errors.New("no service available")
 )
+
+//TODO 
+//var (
+//	_messages atomic.Value
+//	_code     = map[int]struct{}{}
+//)
+//
+//func Register(cm map[int]string) {
+//	_messages.Store(cm)
+//}

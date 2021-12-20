@@ -46,6 +46,7 @@ const (
 	Consistent
 )
 
+//Store has basic information of node
 type Store struct {
 	RaftDataDir string
 	RaftAddr    string
