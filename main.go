@@ -12,8 +12,8 @@ import (
 	"os"
 	"os/signal"
 	"raft-grpc-demo/core"
-	"raft-grpc-demo/service"
 	rpcservicepb "raft-grpc-demo/proto"
+	"raft-grpc-demo/service"
 	"time"
 )
 
@@ -66,6 +66,9 @@ func main() {
 	}
 
 	b, err := json.Marshal(map[string]string{"serviceAddr": *grpcAddr})
+	if err != nil {
+		log.Fatalf("json marshal fail %s", err)
+	}
 	resp, err := http.Post(fmt.Sprintf("http://%s/service_join", *registerAddr), "application-type/json", bytes.NewReader(b))
 	if err != nil {
 		log.Fatalf("join service to client fail %s", err)

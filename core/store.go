@@ -38,12 +38,13 @@ type command struct {
 	Value string `json:"value,omitempty"`
 }
 
+// ConsistencyLevel Consistency Level of the store data
 type ConsistencyLevel int
 
 const (
-	Default ConsistencyLevel = iota
-	Stale
-	Consistent
+	Default    ConsistencyLevel = iota //Default store level
+	Stale                              //Stale returns value which maybe old
+	Consistent                         //Consistent returns value that all nodes are consistent
 )
 
 //Store has basic information of node

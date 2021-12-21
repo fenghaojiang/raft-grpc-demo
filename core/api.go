@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/raft"
 )
 
+//Get the kv store data
 func (s *Store) Get(k string, level ConsistencyLevel) (string, error) {
 	if level != Stale {
 		if s.raft.State() != raft.Leader {
@@ -25,6 +26,7 @@ func (s *Store) Get(k string, level ConsistencyLevel) (string, error) {
 	return s.m[k], nil
 }
 
+//Set the kv store data
 func (s *Store) Set(k, v string) error {
 	if s.raft.State() != raft.Leader {
 		return ErrNotLeader
@@ -45,6 +47,7 @@ func (s *Store) Set(k, v string) error {
 	return f.Error()
 }
 
+//Delete the kv store data
 func (s *Store) Delete(key string) error {
 	if s.raft.State() != raft.Leader {
 		return ErrNotLeader
@@ -63,6 +66,7 @@ func (s *Store) Delete(key string) error {
 	return f.Error()
 }
 
+//Join is used to join the raft cluster
 func (s *Store) Join(nodeID, grpcAddr, raftAddr string) error {
 	s.logger.Printf("received join request for remote node %s at %s", nodeID, raftAddr)
 	configuration := s.raft.GetConfiguration()
@@ -97,6 +101,7 @@ func (s *Store) Join(nodeID, grpcAddr, raftAddr string) error {
 	return nil
 }
 
+//LeaderAPIAddr returns the leader address of the raft cluster
 func (s *Store) LeaderAPIAddr() string {
 	id, err := s.LeaderID()
 	if err != nil {

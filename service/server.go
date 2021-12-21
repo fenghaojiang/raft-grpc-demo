@@ -26,6 +26,7 @@ type StoreApi interface {
 	LeaderAPIAddr() string
 }
 
+//NewServer return server with raft service
 func NewServer(store StoreApi, addr string, ln net.Listener) *Server {
 	return &Server{
 		addr:   addr,
@@ -140,13 +141,12 @@ func (s *Server) verifyLeaderConnReDial(ctx context.Context, req interface{}, ty
 				return nil, err
 			}
 			return rsp, nil
-		} else {
-			rsp, err := s.get(ctx, leaderGrpcAddr, req.(*rpcservicepb.GetReq).Key)
-			if err != nil {
-				return nil, err
-			}
-			return rsp, nil
 		}
+		rsp, err := s.get(ctx, leaderGrpcAddr, req.(*rpcservicepb.GetReq).Key)
+		if err != nil {
+			return nil, err
+		}
+		return rsp, nil
 
 	case SetTypeID:
 		if s.leaderConn == nil {
@@ -162,13 +162,12 @@ func (s *Server) verifyLeaderConnReDial(ctx context.Context, req interface{}, ty
 				return nil, err
 			}
 			return rsp, nil
-		} else {
-			rsp, err := s.set(ctx, leaderGrpcAddr, req.(*rpcservicepb.SetReq).Key, req.(*rpcservicepb.SetReq).Value)
-			if err != nil {
-				return nil, err
-			}
-			return rsp, nil
 		}
+		rsp, err := s.set(ctx, leaderGrpcAddr, req.(*rpcservicepb.SetReq).Key, req.(*rpcservicepb.SetReq).Value)
+		if err != nil {
+			return nil, err
+		}
+		return rsp, nil
 
 	case DeleteTypeID:
 		if s.leaderConn == nil {
@@ -184,13 +183,12 @@ func (s *Server) verifyLeaderConnReDial(ctx context.Context, req interface{}, ty
 				return nil, err
 			}
 			return rsp, nil
-		} else {
-			rsp, err := s.delete(ctx, leaderGrpcAddr, req.(*rpcservicepb.DeleteReq).Key)
-			if err != nil {
-				return nil, err
-			}
-			return rsp, nil
 		}
+		rsp, err := s.delete(ctx, leaderGrpcAddr, req.(*rpcservicepb.DeleteReq).Key)
+		if err != nil {
+			return nil, err
+		}
+		return rsp, nil
 
 	case JoinTypeID:
 		if s.leaderConn == nil {
@@ -206,13 +204,12 @@ func (s *Server) verifyLeaderConnReDial(ctx context.Context, req interface{}, ty
 				return nil, err
 			}
 			return rsp, nil
-		} else {
-			rsp, err := s.join(ctx, leaderGrpcAddr, req.(*rpcservicepb.JoinReq).GrpcAddr, req.(*rpcservicepb.JoinReq).RaftAddr, req.(*rpcservicepb.JoinReq).NodeID)
-			if err != nil {
-				return nil, err
-			}
-			return rsp, nil
 		}
+		rsp, err := s.join(ctx, leaderGrpcAddr, req.(*rpcservicepb.JoinReq).GrpcAddr, req.(*rpcservicepb.JoinReq).RaftAddr, req.(*rpcservicepb.JoinReq).NodeID)
+		if err != nil {
+			return nil, err
+		}
+		return rsp, nil
 	default:
 		return nil, ecode.NoTypeIDError
 	}
